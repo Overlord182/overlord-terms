@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <!-- ဖုန်းများတွင် ကြည့်ပါက မျက်နှာပြင် အကျယ်နှင့် အံဝင်ခွင်ကျဖြစ်စေရန် -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overlord Bot Guide</title>
+
+    <!-- CSS Code များကို ဤနေရာတွင် ထည့်ပါ -->
+    <style>
+        /* တစ်မျက်နှာလုံးစာ နောက်ခံအရောင်နှင့် စာလုံးစတိုင် ပြင်ဆင်ခြင်း */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa; /* နောက်ခံအရောင် ခဲရောင်ဖျော့ဖျော့ */
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        /* ခေါင်းစဉ်များကို အလယ်တည့်တည့်ပို့ရန် */
+        .header-text {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        /* ဗီဒီယိုကို အလယ်တည့်တည့်ပို့မည့် အခွံ (Container) */
+        .video-container {
+            display: flex;
+            justify-content: center; 
+            margin: 0 auto; 
+            width: 90%; 
+            max-width: 800px; 
+        }
+
+        /* အတွင်းထဲက YouTube Player (iframe) ကို အချိုးအစားမှန်စေရန် ချိန်ညှိခြင်း */
+        .video-container iframe {
+            width: 100%;
+            aspect-ratio: 16 / 9; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); 
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Website ၏ ခေါင်းစဉ်စာသားများ -->
+    <div class="header-text">
+        <h2>Overlord Bot အသုံးပြုနည်း လမ်းညွှန်</h2>
+        <p>Bot ကို စတင်အသုံးပြုပုံနှင့် Signal များဖတ်နည်းကို အောက်ပါ ဗီဒီယိုများတွင် အစဉ်လိုက် ကြည့်ရှုနိုင်ပါသည်။</p>
+    </div>
+
+    <!-- YouTube Playlist ထည့်မည့်နေရာ -->
+    <div class="video-container">
+        <!-- YOUR_PLAYLIST_ID_HERE နေရာတွင် သင့် Playlist ID အစစ်ကို ပြောင်းထည့်ရန် မမေ့ပါနဲ့ -->
+        <iframe 
+            src="https://www.youtube.com/embed/videoseries?list=YOUR_PLAYLIST_ID_HERE" 
+            title="Overlord Bot Guide" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+        </iframe>
+    </div>
+
+</body>
+</html>
