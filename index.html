@@ -7,11 +7,8 @@
     
     <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
-    <!-- html2pdf Library CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-    <!-- Google Fonts: Noto Sans Myanmar, Padauk, & Inter -->
+    <!-- Google Fonts: Noto Sans Myanmar & Padauk -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Myanmar:wght@400;600;700&family=Padauk:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -30,7 +27,7 @@
         }
 
         body { 
-            font-family: 'Noto Sans Myanmar', 'Pyidaungsu', 'Padauk', 'Myanmar3', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: 'Noto Sans Myanmar', 'Padauk', 'Pyidaungsu', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             line-height: 1.8; 
             color: var(--text-primary); 
             max-width: 880px; 
@@ -48,7 +45,6 @@
             border: 1px solid var(--border-color);
         }
 
-        /* Top Executive Header */
         .header-box {
             text-align: center;
             border-bottom: 2px dashed var(--border-color);
@@ -85,7 +81,6 @@
             color: var(--text-secondary);
         }
 
-        /* Scrollable TOS Viewer Box */
         .tos-content {
             background: #f8fafc;
             border: 1px solid var(--border-color);
@@ -99,7 +94,6 @@
             scroll-behavior: smooth;
         }
 
-        /* Custom Scrollbar */
         .tos-content::-webkit-scrollbar {
             width: 6px;
         }
@@ -110,9 +104,6 @@
         .tos-content::-webkit-scrollbar-thumb {
             background: #cbd5e1;
             border-radius: 8px;
-        }
-        .tos-content::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
         }
 
         .tos-content b {
@@ -140,7 +131,6 @@
             margin-top: 22px;
             margin-bottom: 12px;
             font-size: 14.5px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
         }
 
         .sub-section-title {
@@ -169,7 +159,6 @@
             color: #0f172a;
         }
 
-        /* Scroll Indicator Notice */
         .scroll-hint {
             text-align: center;
             font-size: 12.5px;
@@ -183,7 +172,6 @@
             transition: all 0.3s ease;
         }
 
-        /* Export PDF Button */
         .pdf-btn-wrapper {
             text-align: center;
             margin: 22px 0;
@@ -210,14 +198,6 @@
             box-shadow: 0 6px 18px rgba(37, 99, 235, 0.38);
         }
 
-        .pdf-btn:disabled {
-            background: #94a3b8;
-            cursor: not-allowed;
-            box-shadow: none;
-            transform: none;
-        }
-
-        /* Actions & Checkbox Box */
         .action-box {
             background: #ffffff;
             border-radius: 14px;
@@ -278,30 +258,51 @@
             transition: 0.2s ease;
         }
 
-        .btn-reject:hover {
-            background: #fee2e2;
-        }
+        /* -------------------------------------------------------------
+           PDF / Print ရိုက်ထုတ်စဉ် မြန်မာစာ ၁၀၀% မှန်ကန်စေရန် Print CSS
+        ------------------------------------------------------------- */
+        @media print {
+            body {
+                background-color: #ffffff !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                font-family: 'Noto Sans Myanmar', 'Padauk', sans-serif !important;
+            }
 
-        /* PDF Render Mode အတွက် CSS ပြင်ဆင်ချက် */
-        .pdf-render-mode {
-            background-color: #ffffff !important;
-            color: #000000 !important;
-            padding: 20px !important;
-            max-height: none !important;
-            overflow: visible !important;
-            font-size: 11pt !important;
-            line-height: 2.2 !important; /* စာလုံးများ အပေါ်အောက် မထပ်စေရန် line-height တိုးထားပါ */
-            letter-spacing: 0px !important; /* စာလုံးအကွာအဝေး ပုံမှန်ထားပါ */
-        }
+            .container {
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
 
-        /* စာပိုဒ်နှင့် စာကြောင်းများ စာမျက်နှာအကူးတွင် ပြတ်မကျန်စေရန် */
-        .pdf-render-mode p, 
-        .pdf-render-mode li, 
-        .pdf-render-mode div,
-        .pdf-render-mode .section-title,
-        .pdf-render-mode .sub-section-title {
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
+            .tos-content {
+                max-height: none !important;
+                overflow: visible !important;
+                border: none !important;
+                background: transparent !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                font-size: 11pt !important;
+                line-height: 2.0 !important;
+            }
+
+            .scroll-hint, .pdf-btn-wrapper, .action-box {
+                display: none !important;
+            }
+
+            .section-title, .sub-section-title, p, li {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+
+            .section-title {
+                border-left: 4px solid #1e3a8a !important;
+                background: #f1f5f9 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
         }
     </style>
 </head>
@@ -529,7 +530,7 @@
             <div class="pdf-btn-wrapper">
                 <button type="button" id="downloadPdfBtn" class="pdf-btn">
                     <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    Download Official PDF Document
+                    Download / Save as PDF
                 </button>
             </div>
 
@@ -582,57 +583,9 @@
             }
         });
 
-        // PDF Generator Logic
-        downloadPdfBtn.addEventListener('click', async function() {
-            const originalText = downloadPdfBtn.innerHTML;
-            downloadPdfBtn.innerText = "PDF Document ထုတ်ယူနေပါသည်...";
-            downloadPdfBtn.disabled = true;
-
-            // ၁။ Font များ အပြည့်အဝ Load ဖြစ်သည်အထိ စောင့်ပါ
-            await document.fonts.ready;
-
-            const element = tosContent.cloneNode(true);
-            element.classList.add('pdf-render-mode');
-
-            const pdfContainer = document.createElement('div');
-            pdfContainer.style.padding = '10px';
-            pdfContainer.innerHTML = `
-                <div style="text-align: center; border-bottom: 2px solid #1e3a8a; padding-bottom: 12px; margin-bottom: 18px;">
-                    <h2 style="color: #1e3a8a; font-size: 20pt; margin: 0; font-family: 'Noto Sans Myanmar', sans-serif;">Overlord System</h2>
-                    <p style="font-size: 10pt; color: #475569; margin: 6px 0 0 0;">Master Terms of Service & Legal Compliance Document</p>
-                </div>
-            `;
-            pdfContainer.appendChild(element);
-
-            // ၂။ html2pdf Options များကို တိကျစွာ သတ်မှတ်ပါ
-            const opt = {
-                margin:       [10, 10, 10, 10], // top, left, bottom, right
-                filename:     'Overlord_Terms_of_Service_Official.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { 
-                    scale: 2, 
-                    useCORS: true, 
-                    letterRendering: false, // စာလုံးထပ်ခြင်းကို သက်သာစေသည်
-                    scrollY: 0,
-                    scrollX: 0
-                },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak:    { 
-                    mode: ['css', 'legacy'],
-                    avoid: ['p', 'li', '.section-title', '.sub-section-title']
-                }
-            };
-
-            // ၃။ PDF ထုတ်ယူခြင်း
-            html2pdf().set(opt).from(pdfContainer).save().then(() => {
-                downloadPdfBtn.innerHTML = originalText;
-                downloadPdfBtn.disabled = false;
-            }).catch(err => {
-                console.error("PDF Export Error:", err);
-                alert("PDF ထုတ်ယူရာတွင် အမှားအယွင်းရှိပါသည်၊ ပြန်လည်ကြိုးစားပါ။");
-                downloadPdfBtn.innerHTML = originalText;
-                downloadPdfBtn.disabled = false;
-            });
+        // Native Browser Print Logic (Handles Myanmar CTL Fonts 100% Correctly)
+        downloadPdfBtn.addEventListener('click', function() {
+            window.print();
         });
 
         // Checkbox interaction
