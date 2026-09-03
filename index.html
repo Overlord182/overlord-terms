@@ -8,6 +8,9 @@
     <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
+    <!-- html2pdf Library CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
         :root {
             --bg-color: var(--tg-theme-bg-color, #f4f6f7);
@@ -119,16 +122,20 @@
             cursor: not-allowed;
         }
         .pdf-btn {
-            padding: 10px 20px; 
+            padding: 12px 25px; 
             background-color: #3498db; 
             color: white; 
             border: none;
             border-radius: 6px; 
             font-weight: bold; 
-            font-size: 14px; 
+            font-size: 15px; 
             cursor: pointer;
             display: inline-block;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: background 0.2s ease;
+        }
+        .pdf-btn:hover {
+            background-color: #2980b9;
         }
     </style>
 </head>
@@ -255,10 +262,11 @@ Overlord စနစ်ကို မစတင်မီ အောက်ပါ ဥ�
             <!-- Scroll Indicator Message -->
             <div id="scrollHint" class="scroll-hint">⚠️ စည်းမျဉ်းများကို အောက်ဆုံးအထိ Scroll ဆွဲဖတ်ပါ။</div>
 
+            <!-- Dynamic PDF Download Button -->
             <div style="text-align: center; margin-top: 25px; margin-bottom: 25px;">
-                <a href="Overlord_Terms_of_Service.pdf" target="_blank" download="Overlord_System_Guide.pdf" style="padding: 12px 25px; background-color: #2ecc71; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <button type="button" id="downloadPdfBtn" class="pdf-btn">
                     📥 PDF ကို Download ရယူရန်
-                </a>
+                </button>
             </div>
 
             <!-- အမှန်ခြစ်ကွက်နှင့် ခလုတ်များ -->
@@ -297,7 +305,6 @@ Overlord စနစ်ကို မစတင်မီ အောက်ပါ ဥ�
 
         tosContent.addEventListener('scroll', function() {
             if (!hasScrolledToBottom) {
-                // Math.ceil သုံး၍ Fractional pixels ပြဿနာကို ဖြေရှင်းခြင်း
                 const isBottom = Math.ceil(tosContent.scrollTop + tosContent.clientHeight) >= tosContent.scrollHeight - 35;
                 if (isBottom) {
                     hasScrolledToBottom = true;
@@ -309,14 +316,37 @@ Overlord စနစ်ကို မစတင်မီ အောက်ပါ ဥ�
             }
         });
 
-        // 2. PDF Open Handler (Telegram In-App Browser Safe)
+        // 2. Direct Client-side Dynamic PDF Generation (html2pdf.js)
         downloadPdfBtn.addEventListener('click', function() {
-            const pdfUrl = window.location.origin + '/Overlord_Terms_of_Service.pdf';
-            if (tg && tg.openLink) {
-                tg.openLink(pdfUrl);
-            } else {
-                window.open(pdfUrl, '_blank');
-            }
+            const originalText = downloadPdfBtn.innerText;
+            downloadPdfBtn.innerText = "PDF ထုတ်ယူနေပါသည်။...";
+            downloadPdfBtn.disabled = true;
+
+            // Scroll Box ၏ Scrollbar Clipping မဖြစ်စေရန် Content အား Clone ပြုလုပ်၍ ပုံစံညှိခြင်း
+            const element = tosContent.cloneNode(true);
+            element.style.maxHeight = 'none';
+            element.style.overflow = 'visible';
+            element.style.background = '#ffffff';
+            element.style.color = '#111111';
+            element.style.padding = '25px';
+
+            const opt = {
+                margin:       10, // mm
+                filename:     'Overlord_Terms_of_Service.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                downloadPdfBtn.innerText = originalText;
+                downloadPdfBtn.disabled = false;
+            }).catch(err => {
+                console.error("PDF Export Error:", err);
+                alert("PDF ထုတ်ယူရာတွင် အမှားအယွင်းရှိပါသည်၊ ပြန်လည်ကြိုးစားပါ။");
+                downloadPdfBtn.innerText = originalText;
+                downloadPdfBtn.disabled = false;
+            });
         });
 
         // 3. Checkbox Toggle
@@ -332,7 +362,7 @@ Overlord စနစ်ကို မစတင်မီ အောက်ပါ ဥ�
             }
         });
 
-        // Worker API Endpoint (မိမိ၏ Cloudflare Worker Subdomain URL ဖြင့် အစားထိုးပါ)
+        // Worker API Endpoint
         const WORKER_API_URL = 'https://your-worker-subdomain.workers.dev/api/tos-agree';
 
         // 4. Confirm Action
@@ -424,4 +454,3 @@ Overlord စနစ်ကို မစတင်မီ အောက်ပါ ဥ�
     </script>
 </body>
 </html>
-
