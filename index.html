@@ -3,78 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Overlord VIP - Terms of Service</title>
+    <title>Overlord System - Terms of Service</title>
+    
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
     <style>
-        body { font-family: sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f4f6f7; }
-        .container { background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        h1 { color: #2c3e50; text-align: center; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        :root {
+            --bg-color: var(--tg-theme-bg-color, #f4f6f7);
+            --text-color: var(--tg-theme-text-color, #333333);
+            --card-bg: var(--tg-theme-secondary-bg-color, #ffffff);
+            --hint-color: var(--tg-theme-hint-color, #7f8c8d);
+            --link-color: var(--tg-theme-link-color, #3498db);
+        }
+
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6; 
+            color: var(--text-color); 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 15px; 
+            background-color: var(--bg-color); 
+        }
+        .container { 
+            background-color: var(--card-bg); 
+            padding: 20px; 
+            border-radius: 12px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
+        }
+        h1 { 
+            color: var(--text-color); 
+            text-align: center; 
+            border-bottom: 2px solid var(--link-color); 
+            padding-bottom: 10px; 
+            font-size: 20px;
+        }
         
         .tos-content {
             white-space: pre-line;
             word-wrap: break-word;
-            margin-top: 20px;
-            max-height: 400px;
+            margin-top: 15px;
+            max-height: 55vh;
             overflow-y: auto;
             padding: 15px;
-            background: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            background: var(--tg-theme-secondary-bg-color, #f9f9f9);
+            border: 1px solid var(--tg-theme-hint-color, rgba(0, 0, 0, 0.1));
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--tg-theme-text-color, #333333);
+        }
+
+        .scroll-hint {
+            text-align: center;
+            font-size: 11px;
+            color: #e67e22;
+            margin-top: 5px;
+            font-weight: bold;
         }
 
         .action-box {
-            margin-top: 25px;
-            padding: 20px;
-            background: #fff;
-            border-radius: 6px;
+            margin-top: 15px;
+            padding: 15px;
+            background: var(--card-bg);
+            border-radius: 8px;
             text-align: center;
-            border: 1px solid #ddd;
+            border: 1px solid rgba(0, 0, 0, 0.1);
         }
         .checkbox-label {
             cursor: pointer;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
             margin-bottom: 15px;
             font-weight: bold;
-            color: #2c3e50;
+            color: var(--text-color);
+            font-size: 13px;
+            text-align: left;
+        }
+        .checkbox-label.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
         .btn-group {
             display: flex;
             justify-content: center;
-            gap: 15px;
+            gap: 10px;
         }
         .btn-confirm {
-            padding: 10px 25px;
+            flex: 1;
+            padding: 12px 15px;
             background-color: #2ecc71;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: not-allowed;
-            opacity: 0.6;
+            opacity: 0.5;
             font-weight: bold;
             font-size: 14px;
             transition: 0.3s;
         }
         .btn-reject {
-            padding: 10px 25px;
+            flex: 1;
+            padding: 12px 15px;
             background-color: #e74c3c;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
             font-size: 14px;
             transition: 0.3s;
         }
-        .btn-reject:hover { background-color: #c0392b; }
+        .btn-reject:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .pdf-btn {
+            padding: 10px 20px; 
+            background-color: #3498db; 
+            color: white; 
+            border: none;
+            border-radius: 6px; 
+            font-weight: bold; 
+            font-size: 14px; 
+            cursor: pointer;
+            display: inline-block;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        
         <div id="tosSection">
-            <h1>Overlord VIP Group - Terms of Service</h1>
-            <p><em>Last Updated: August 2026</em></p>
+            <h1>Overlord System - Terms of Service</h1>
+            <p style="text-align: center; font-size: 12px; color: var(--hint-color);"><em>Last Updated: August 2026</em></p>
 
-            <div class="tos-content"><b>🔒 Overlord System - Master Terms of Service, User Agreement & Privacy Policy</b>
+            <div class="tos-content" id="tosContent"><b>🔒 Overlord System - Master Terms of Service, User Agreement & Privacy Policy</b>
 
 Overlord စနစ်ကို မစတင်မီ အောက်ပါ ဥပဒေရေးရာ စည်းမျဉ်းများ၊ အန္တရာယ် သတိပေးချက်များနှင့် ကိုယ်ရေးကိုယ်တာ အချက်အလက် မူဝါဒများကို မဖြစ်မနေ အသေးစိတ် ဖတ်ရှုပြီး သဘောတူညီရန် လိုအပ်ပါသည်။
 <i>(Before starting the Overlord system, you must read in detail and agree to the following legal terms, risk warnings, and privacy policies.)</i>
@@ -101,7 +165,7 @@ Overlord စနစ်ကို မစတင်မီ အောက်ပါ ဥ�
    ၂၄ နာရီပတ်လုံး အတက်အကျ လွန်စွာ ပြင်းထန်ခြင်း၊ Liquidity လျှော့ကျခြင်းနှင့် ကွန်ရက်/Exchange ပိတ်သွားနိုင်သည့် စွန့်စားရမှုများ ရှိသည်။
    <i>(There are risks of 24/7 extreme volatility, liquidity reduction, and potential network or exchange shutdowns.)</i>
  * <b>နိုင်ငံတကာ ငွေကြေး ဈေးကွက် (Forex Market Risk):</b>
-   High Leverage အသုံးပြုမှုကြောင့် လျှင်မြန်စွာ အရင်းပြောင် ဆုံးရှုံးနိုင်ခြင်း၊ စနေ/တနင်္ဂနွေ ဈေးကွက်ပိတ်ချိန်များအပြီး Price Gap များကြောင့် Stop-Loss မထိဘဲ အရှုံးကြီးမားနိုင်သည့် စွန့်စားရမှုများ ရှိသည်။
+   High Leverage အသုံးပြုမှုကြောင့် လျှင်မြန်စွာ အရင်းပြောင် ဆုံးရှုံးနိုင်ခြင်း၊ စနေ/တနွေ ဈေးကွက်ပိတ်ချိန်များအပြီး Price Gap များကြောင့် Stop-Loss မထိဘဲ အရှုံးကြီးမားနိုင်သည့် စွန့်စားရမှုများ ရှိသည်။
    <i>(Risks include rapid capital depletion due to high leverage, and massive losses without triggering Stop-Loss due to price gaps after weekend market closures.)</i>
  * <b>စတော့ခ် ဈေးကွက် (Stock Market Risk):</b>
    Pre-Market / After-Hours အပြောင်းအလဲများ၊ ကုမ္ပဏီ အစီရင်ခံစာ ထွက်ချိန်များတွင် Volatility ပြင်းထန်ပြီး Slippage ဖြစ်ပေါ်နိုင်ကြောင်း သဘောတူရမည်။
@@ -166,7 +230,7 @@ Overlord စနစ်ကို မစတင်မီ အောက်ပါ ဥ�
    အသုံးပြုသူသည် မိမိ လက်ရှိ နေထိုင်ရာ သို့မဟုတ် သုံးစွဲရာ နိုင်ငံ/ဒေသ၏ ဘဏ္ဍာရေးဆိုင်ရာ ဥပဒေများနှင့် စည်းမျဉ်းများကို ကိုယ်တိုင် လိုက်နာရန် ရာနှုန်းပြည့် တာဝန်ရှိသည်။
    <i>(Users are 100% responsible for complying with the financial laws and regulations of their current country or region of residence/use.)</i>
  * <b>မြန်မာနိုင်ငံ ဥပဒေဆိုင်ရာ အသိပေးချက် (Myanmar Legal Disclaimer):</b>
-   မြန်မာနိုင်ငံ ဗဟိုဘဏ် (Central Bank of Myanmar - CBM) ၏ မူဝါဒများနှင့် သတိပေးချက်များအရ ဒစ်ဂျစ်တယ် ငွေကြေးများ (Cryptocurrencies/Digital Assets) ကို တရားဝင် ငွေကြေးအဖြစ် အသိအမှတ်ပြုထားခြင်း မရှိပါ။ Overlord သည် အချက်အလက်နှင့် နည်းပညာ ဆော့ဖ်ဝဲလ် ဝန်ဆောင်မှု သက်သက်သာ ဖြစ်ပြီး၊ မြန်မာနိုင်ငံ သို့မဟုတ် သက်ဆိုင်ရာ ဒေသတွင်း တားမြစ်ထားသော ငွေကြေး သို့မဟုတ် ကုန်သွယ်မှုများတွင် ပါဝင်ဆောင်ရွက်ရန် တိုက်တွန်းခြင်း မဟုတ်ပါ။ အဆိုပါ စည်းမျဉ်းများအား ဖောက်ဖျက်၍ အသုံးပြုပါက အသုံးပြုသူ၏ ကိုယ်ပိုင် တာဝန်သာ ဖြစ်သည်။
+   မြန်မာနိုင်ငံ ဗဟိုဘဏ် (Central Bank of Myanmar - CBM) ၏ မူဝါဒများနှင့် သတိပေးချက်များအရ ဒစ်ဂျစ်တယ် ငွေကြေးများကို တရားဝင် ငွေကြေးအဖြစ် အသိအမှတ်ပြုထားခြင်း မရှိပါ။ Overlord သည် အချက်အလက်နှင့် နည်းပညာ ဆော့ဖ်ဝဲလ် ဝန်ဆောင်မှု သက်သက်သာ ဖြစ်ပြီး၊ မြန်မာနိုင်ငံ သို့မဟုတ် သက်ဆိုင်ရာ ဒေသတွင်း တားမြစ်ထားသော ငွေကြေး သို့မဟုတ် ကုန်သွယ်မှုများတွင် ပါဝင်ဆောင်ရွက်ရန် တိုက်တွန်းခြင်း မဟုတ်ပါ။ အဆိုပါ စည်းမျဉ်းများအား ဖောက်ဖျက်၍ အသုံးပြုပါက အသုံးပြုသူ၏ ကိုယ်ပိုင် တာဝန်သာ ဖြစ်သည်။
    <i>(According to Central Bank of Myanmar (CBM) policies, cryptocurrencies are not officially recognized as legal tender. Overlord is solely an information and technical software service, not urging participation in restricted local trades. Violations are strictly the user's sole responsibility.)</i>
  * <b>နိုင်ငံတကာ လိုင်စင်း ကင်းလွတ်ခွင့် (International Licensing Exemption):</b>
    Overlord သည် မည်သည့် နိုင်ငံတွင်မျှ စေတနာဝန်ထမ်း သို့မဟုတ် စီးပွားရေးအရ လိုင်စင်ယူထားသော Broker သို့မဟုတ် Investment Fund မဟုတ်သည့်အတွက် Financial Regulation ဆိုင်ရာ တာဝန်ယူမှုများမှ ကင်းလွတ်ခွင့် ရှိသည်။
@@ -184,20 +248,27 @@ Overlord စနစ်ကို မစတင်မီ အောက်ပါ ဥ�
  4. <i>ကျွန်ုပ် လက်ရှိနေထိုင်ရာ ဒေသ (မြန်မာနိုင်ငံ အပါအဝင်) ၏ ဘဏ္ဍာရေးနှင့် Crypto ဆိုင်ရာ ဥပဒေများကို ကိုယ်တိုင် လိုက်နာပါမည်။
     (I will personally comply with the financial and crypto regulations of my current region of residence including Myanmar.)</i>
  5. <i>စနစ် ချို့ယွင်းမှု၊ အင်တာနက် ပြဿနာ သို့မဟုတ် ဈေးကွက် အတက်အကျကြောင့် ဖြစ်ပေါ်လာမည့် မည်သည့် ငွေကြေး ဆုံးရှုံးမှု အတွက်မဆို Overlord သို့မဟုတ် Developer ထံမှ လျော်ကြေး တောင်းခံခြင်း၊ တရားစွဲဆိုခြင်း လုံးဝ (လုံးဝ) ပြုလုပ်မည် မဟုတ်ပါ။
-    (I will never claim compensation or take legal action against Overlord or the Developer for any financial loss caused by system glitches, internet issues, or market volatility.)</i></div>
+    (I will never claim compensation or take legal action against Overlord or the Developer for any financial loss caused by system glitches, internet issues, or market volatility.)</i>
+ 6. <i>စနစ်လုံခြုံရေးနှင့် Group ဝင်ခွင့် (Join Request) များကို တိတိကျကျ စစ်ဆေးနိုင်ရန်အတွက်သာ သင့်၏ Telegram User ID နှင့် Name ကို လုံခြုံသော Cloud Database တွင် ယာယီမှတ်သားထားမည်ကို လက်ခံပါသည်။ အခြားမည်သည့် ကိုယ်ရေးကိုယ်တာ အချက်အလက် (ဥပမာ - ဖုန်းနံပါတ်၊ နေရပ်လိပ်စာ) ကိုမျှ ကောက်ယူမည်မဟုတ်ဘဲ၊ ပြင်ပသို့ မျှဝေမည်မဟုတ်ပါ။ သင် Group မှ ထွက်ခွာသွားပါက ထိုအချက်အလက်များကို Database မှ အလိုအလျောက် ဖျက်ပစ်မည် ဖြစ်သည်။
+    (I agree that for system security and join request verification, only my Telegram User ID and Name will be temporarily stored in a secure cloud database. No other personal data will be collected or shared with third parties, and this data will be automatically deleted upon leaving the group.)</i></div>
 
-            <!-- 👇 ဒီနေရာမှာ PDF Download ခလုတ် ဝင်လာပါပြီ 👇 -->
-            <div style="text-align: center; margin-top: 25px; margin-bottom: 25px;">
-                <a href="Overlord_Terms_of_Service.pdf" target="_blank" download="Overlord_System_Guide.pdf" style="padding: 12px 25px; background-color: #2ecc71; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <!-- Scroll Indicator Message -->
+            <div id="scrollHint" class="scroll-hint">⚠️ စည်းမျဉ်းများကို အောက်ဆုံးအထိ Scroll ဆွဲဖတ်ပါ။</div>
+
+            <!-- PDF Download Button -->
+            <div style="text-align: center; margin-top: 15px; margin-bottom: 15px;">
+                <button type="button" class="pdf-btn" id="downloadPdfBtn">
                     📥 PDF ကို Download ရယူရန်
-                </a>
+                </button>
             </div>
+
             <!-- အမှန်ခြစ်ကွက်နှင့် ခလုတ်များ -->
             <div class="action-box">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="agreeCheckbox" style="transform: scale(1.2); margin-right: 8px;">
+                <label class="checkbox-label disabled" id="checkboxLabel">
+                    <input type="checkbox" id="agreeCheckbox" disabled style="transform: scale(1.3); margin-right: 10px;">
                     အထက်ပါ စည်းမျဉ်းစည်းကမ်းများနှင့် မူဝါဒများကို ဖတ်ရှုပြီး သဘောတူလက်ခံပါသည်။
                 </label>
+
                 <div class="btn-group">
                     <button id="confirmBtn" class="btn-confirm" disabled>လက်ခံပါသည် (Confirm)</button>
                     <button id="rejectBtn" class="btn-reject">လက်မခံပါ (Reject)</button>
@@ -207,36 +278,151 @@ Overlord စနစ်ကို မစတင်မီ အောက်ပါ ဥ�
     </div>
 
     <script>
+        const tg = window.Telegram ? window.Telegram.WebApp : null;
+        
+        if (tg) {
+            tg.ready();
+            tg.expand();
+        }
+
+        const tosContent = document.getElementById('tosContent');
+        const scrollHint = document.getElementById('scrollHint');
         const checkbox = document.getElementById('agreeCheckbox');
+        const checkboxLabel = document.getElementById('checkboxLabel');
         const confirmBtn = document.getElementById('confirmBtn');
         const rejectBtn = document.getElementById('rejectBtn');
+        const downloadPdfBtn = document.getElementById('downloadPdfBtn');
 
+        // 1. Scroll-to-Read Check Logic
+        let hasScrolledToBottom = false;
+
+        tosContent.addEventListener('scroll', function() {
+            if (!hasScrolledToBottom) {
+                // Math.ceil သုံး၍ Fractional pixels ပြဿနာကို ဖြေရှင်းခြင်း
+                const isBottom = Math.ceil(tosContent.scrollTop + tosContent.clientHeight) >= tosContent.scrollHeight - 35;
+                if (isBottom) {
+                    hasScrolledToBottom = true;
+                    checkbox.disabled = false;
+                    checkboxLabel.classList.remove('disabled');
+                    scrollHint.style.color = '#2ecc71';
+                    scrollHint.innerText = '✅ စည်းမျဉ်းများကို ဖတ်ရှုပြီးပါပြီ။ အမှန်ခြစ်နိုင်ပါပြီ။';
+                }
+            }
+        });
+
+        // 2. PDF Open Handler (Telegram In-App Browser Safe)
+        downloadPdfBtn.addEventListener('click', function() {
+            const pdfUrl = window.location.origin + '/Overlord_Terms_of_Service.pdf';
+            if (tg && tg.openLink) {
+                tg.openLink(pdfUrl);
+            } else {
+                window.open(pdfUrl, '_blank');
+            }
+        });
+
+        // 3. Checkbox Toggle
         checkbox.addEventListener('change', function() {
-            if (this.checked) {
+            if (this.checked && hasScrolledToBottom) {
                 confirmBtn.disabled = false;
                 confirmBtn.style.cursor = 'pointer';
                 confirmBtn.style.opacity = '1';
-                confirmBtn.innerText = "လက်ခံပါသည် (Confirm) - overlord_pro_channel သို့ဝင်မည်";
             } else {
                 confirmBtn.disabled = true;
                 confirmBtn.style.cursor = 'not-allowed';
-                confirmBtn.style.opacity = '0.6';
+                confirmBtn.style.opacity = '0.5';
+            }
+        });
+
+        // Worker API Endpoint (မိမိ၏ Cloudflare Worker Subdomain URL ဖြင့် အစားထိုးပါ)
+        const WORKER_API_URL = 'https://your-worker-subdomain.workers.dev/api/tos-agree';
+
+        // 4. Confirm Action
+        confirmBtn.addEventListener('click', async function() {
+            if (!checkbox.checked || !hasScrolledToBottom) return;
+
+            confirmBtn.disabled = true;
+            rejectBtn.disabled = true;
+            confirmBtn.style.opacity = '0.5';
+            confirmBtn.innerText = "ခဏစောင့်ပါ...";
+
+            const payload = {
+                status: "ACCEPTED",
+                action: "tos_agree",
+                initData: tg ? tg.initData : "",
+                timestamp: new Date().toISOString()
+            };
+
+            let isSuccess = false;
+
+            try {
+                const response = await fetch(WORKER_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (response.ok) {
+                    isSuccess = true;
+                }
+            } catch (err) {
+                console.error("API Direct Call Error:", err);
+            }
+
+            if (tg) {
+                try {
+                    tg.sendData(JSON.stringify(payload));
+                    isSuccess = true;
+                } catch (e) {
+                    console.log("Inline Mode detected, sendData bypassed");
+                }
+            }
+
+            if (isSuccess) {
+                if (tg) {
+                    tg.close();
+                } else {
+                    alert('ဖတ်ရှုပြီးပါပြီ။ ကျေးဇူးပြု၍ Telegram Chat သို့ ပြန်သွားနိုင်ပါသည်။');
+                }
+            } else {
+                alert('ချိတ်ဆက်မှု မအောင်မြင်ပါ။ ခဏအကြာတွင် ပြန်လည်ကြိုးစားပါ။');
+                confirmBtn.disabled = false;
+                rejectBtn.disabled = false;
+                confirmBtn.style.opacity = '1';
                 confirmBtn.innerText = "လက်ခံပါသည် (Confirm)";
             }
         });
 
-        // Confirm နှိပ်ပါက Telegram VIP Group သို့ တိုက်ရိုက် ရောက်သွားမည်
-        confirmBtn.addEventListener('click', function() {
-            if (checkbox.checked) {
-                // 👇 ဤနေရာတွင် သင်၏ VIP Telegram Link ကို ထည့်ပါ 👇
-                window.location.href = 'https://t.me/+8qMGB6AhTx42MGE1';
-            }
-        });
+        // 5. Reject Action
+        rejectBtn.addEventListener('click', async function() {
+            confirmBtn.disabled = true;
+            rejectBtn.disabled = true;
+            rejectBtn.innerText = "ခဏစောင့်ပါ...";
 
-        rejectBtn.addEventListener('click', function() {
-            alert('စည်းကမ်းချက်များကို လက်မခံသဖြင့် ဝန်ဆောင်မှုကို ပယ်ဖျက်လိုက်ပါသည်။');
-            window.location.href = 'https://www.google.com'; 
+            const payload = {
+                status: "REJECTED",
+                action: "tos_reject",
+                initData: tg ? tg.initData : "",
+                timestamp: new Date().toISOString()
+            };
+
+            try {
+                await fetch(WORKER_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            } catch (err) {}
+
+            if (tg) {
+                try { 
+                    tg.sendData(JSON.stringify(payload)); 
+                } catch (e) {}
+                tg.close();
+            } else {
+                alert('စည်းကမ်းချက်များကို လက်မခံသဖြင့် ဝန်ဆောင်မှုကို ပယ်ဖျက်လိုက်ပါသည်။');
+                window.location.href = 'https://www.google.com';
+            }
         });
     </script>
 </body>
 </html>
+
