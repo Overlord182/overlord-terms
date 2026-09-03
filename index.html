@@ -282,26 +282,26 @@
             background: #fee2e2;
         }
 
-        /* PDF Printing Layout Engine Fixes */
+        /* PDF Render Mode အတွက် CSS ပြင်ဆင်ချက် */
         .pdf-render-mode {
             background-color: #ffffff !important;
             color: #000000 !important;
-            padding: 25px !important;
+            padding: 20px !important;
             max-height: none !important;
             overflow: visible !important;
             font-size: 11pt !important;
-            line-height: 1.8 !important;
+            line-height: 2.2 !important; /* စာလုံးများ အပေါ်အောက် မထပ်စေရန် line-height တိုးထားပါ */
+            letter-spacing: 0px !important; /* စာလုံးအကွာအဝေး ပုံမှန်ထားပါ */
         }
 
-        .pdf-render-mode .section-title {
-            background: #f1f5f9 !important;
-            color: #0f172a !important;
-            border-left: 4px solid #1e3a8a !important;
-            page-break-after: avoid;
-        }
-
-        .pdf-render-mode li {
-            page-break-inside: avoid;
+        /* စာပိုဒ်နှင့် စာကြောင်းများ စာမျက်နှာအကူးတွင် ပြတ်မကျန်စေရန် */
+        .pdf-render-mode p, 
+        .pdf-render-mode li, 
+        .pdf-render-mode div,
+        .pdf-render-mode .section-title,
+        .pdf-render-mode .sub-section-title {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
         }
     </style>
 </head>
@@ -583,10 +583,13 @@
         });
 
         // PDF Generator Logic
-        downloadPdfBtn.addEventListener('click', function() {
+        downloadPdfBtn.addEventListener('click', async function() {
             const originalText = downloadPdfBtn.innerHTML;
-            downloadPdfBtn.innerText = "PDF Document ထုတ်ယူနေပါသည်။...";
+            downloadPdfBtn.innerText = "PDF Document ထုတ်ယူနေပါသည်...";
             downloadPdfBtn.disabled = true;
+
+            // ၁။ Font များ အပြည့်အဝ Load ဖြစ်သည်အထိ စောင့်ပါ
+            await document.fonts.ready;
 
             const element = tosContent.cloneNode(true);
             element.classList.add('pdf-render-mode');
@@ -601,15 +604,26 @@
             `;
             pdfContainer.appendChild(element);
 
+            // ၂။ html2pdf Options များကို တိကျစွာ သတ်မှတ်ပါ
             const opt = {
-                margin:       [12, 12, 12, 12],
+                margin:       [10, 10, 10, 10], // top, left, bottom, right
                 filename:     'Overlord_Terms_of_Service_Official.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true, 
+                    letterRendering: false, // စာလုံးထပ်ခြင်းကို သက်သာစေသည်
+                    scrollY: 0,
+                    scrollX: 0
+                },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+                pagebreak:    { 
+                    mode: ['css', 'legacy'],
+                    avoid: ['p', 'li', '.section-title', '.sub-section-title']
+                }
             };
 
+            // ၃။ PDF ထုတ်ယူခြင်း
             html2pdf().set(opt).from(pdfContainer).save().then(() => {
                 downloadPdfBtn.innerHTML = originalText;
                 downloadPdfBtn.disabled = false;
