@@ -172,7 +172,7 @@ Overlord စနစ်ကို မစတင်မီ အောက်ပါ ဥ�
    ၂၄ နာရီပတ်လုံး အတက်အကျ လွန်စွာ ပြင်းထန်ခြင်း၊ Liquidity လျှော့ကျခြင်းနှင့် ကွန်ရက်/Exchange ပိတ်သွားနိုင်သည့် စွန့်စားရမှုများ ရှိသည်။
    <i>(There are risks of 24/7 extreme volatility, liquidity reduction, and potential network or exchange shutdowns.)</i>
  * <b>နိုင်ငံတကာ ငွေကြေး ဈေးကွက် (Forex Market Risk):</b>
-   High Leverage အသုံးပြုမှုကြောင့် လျှင်မြန်စွာ အရင်းပြောင် ဆုံးရှုံးနိုင်ခြင်း၊ စနေ/တနွေ ဈေးကွက်ပိတ်ချိန်များအပြီး Price Gap များကြောင့် Stop-Loss မထိဘဲ အရှုံးကြီးမားနိုင်သည့် စွန့်စားရမှုများ ရှိသည်။
+   High Leverage အသုံးပြုမှုကြောင့် လျှင်မြန်စွာ အရင်းပြောင် ဆုံးရှုံးနိုင်ခြင်း၊ စနေ/တနင်္ဂနွေ ဈေးကွက်ပိတ်ချိန်များအပြီး Price Gap များကြောင့် Stop-Loss မထိဘဲ အရှုံးကြီးမားနိုင်သည့် စွန့်စားရမှုများ ရှိသည်။
    <i>(Risks include rapid capital depletion due to high leverage, and massive losses without triggering Stop-Loss due to price gaps after weekend market closures.)</i>
  * <b>စတော့ခ် ဈေးကွက် (Stock Market Risk):</b>
    Pre-Market / After-Hours အပြောင်းအလဲများ၊ ကုမ္ပဏီ အစီရင်ခံစာ ထွက်ချိန်များတွင် Volatility ပြင်းထန်ပြီး Slippage ဖြစ်ပေါ်နိုင်ကြောင်း သဘောတူရမည်။
@@ -316,13 +316,12 @@ Overlord စနစ်ကို မစတင်မီ အောက်ပါ ဥ�
             }
         });
 
-        // 2. Direct Client-side Dynamic PDF Generation (html2pdf.js)
+        // 2. Client-side Dynamic PDF Generation
         downloadPdfBtn.addEventListener('click', function() {
             const originalText = downloadPdfBtn.innerText;
             downloadPdfBtn.innerText = "PDF ထုတ်ယူနေပါသည်။...";
             downloadPdfBtn.disabled = true;
 
-            // Scroll Box ၏ Scrollbar Clipping မဖြစ်စေရန် Content အား Clone ပြုလုပ်၍ ပုံစံညှိခြင်း
             const element = tosContent.cloneNode(true);
             element.style.maxHeight = 'none';
             element.style.overflow = 'visible';
@@ -331,7 +330,7 @@ Overlord စနစ်ကို မစတင်မီ အောက်ပါ ဥ�
             element.style.padding = '25px';
 
             const opt = {
-                margin:       10, // mm
+                margin:       10,
                 filename:     'Overlord_Terms_of_Service.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true },
@@ -362,7 +361,6 @@ Overlord စနစ်ကို မစတင်မီ အောက်ပါ ဥ�
             }
         });
 
-        // Worker API Endpoint
         const WORKER_API_URL = 'https://your-worker-subdomain.workers.dev/api/tos-agree';
 
         // 4. Confirm Action
