@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="robots" content="noindex, nofollow">
-    <title>Overlord Bot Guide</title>
+    <title>Overlord Bot Guide & Continuous Player</title>
 
     <!-- Telegram WebApp JS SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -13,11 +13,22 @@
 
     <style>
         :root {
-            --bg-color: var(--tg-theme-bg-color, #f8f9fa);
-            --text-color: var(--tg-theme-text-color, #333333);
-            --hint-color: var(--tg-theme-hint-color, #666666);
+            --primary-color: #ff0000;
+            --bg-color: var(--tg-theme-bg-color, #0f0f0f);
+            --card-bg: #1f1f1f;
+            --text-color: var(--tg-theme-text-color, #ffffff);
+            --hint-color: var(--tg-theme-hint-color, #aaaaaa);
             --btn-color: var(--tg-theme-button-color, #2481cc);
             --btn-text-color: var(--tg-theme-button-text-color, #ffffff);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
         }
 
         body {
@@ -26,23 +37,20 @@
             color: var(--text-color);
             margin: 0;
             padding: 15px;
-            box-sizing: border-box;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             padding-top: calc(15px + env(safe-area-inset-top));
             padding-bottom: calc(15px + env(safe-area-inset-bottom));
-
-            /* Copy / Text Selection & Long Press တားဆီးရန် CSS */
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            -webkit-touch-callout: none;
         }
 
         .header-text {
             text-align: center;
             margin-bottom: 15px;
             transition: opacity 0.3s ease;
+            width: 100%;
+            max-width: 800px;
         }
 
         .header-text h2 {
@@ -57,6 +65,7 @@
             line-height: 1.4;
         }
 
+        /* Video Container & Gestures */
         .video-container {
             position: relative;
             display: flex;
@@ -66,15 +75,15 @@
             margin: 0 auto; 
             width: 100%; 
             max-width: 800px; 
+            aspect-ratio: 16 / 9;
             background: #000;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
             transition: all 0.3s ease;
             touch-action: none;
         }
 
-        /* Full Interactive Shield Overlay (100% မကွယ်ဘဲ Click / Long Press မှန်သမျှကို ကြားကပိတ်ဆို့ပေးသည်) */
         .full-shield-overlay {
             position: absolute;
             top: 0;
@@ -82,12 +91,11 @@
             width: 100%;
             height: 100%;
             z-index: 50;
-            background: rgba(0, 0, 0, 0.001); /* iOS Touch ပျောက်မသွားစေရန် */
+            background: rgba(0, 0, 0, 0.001);
             touch-action: none;
             cursor: pointer;
         }
 
-        /* HUD Indicator */
         .hud-indicator {
             position: absolute;
             top: 50%;
@@ -114,11 +122,51 @@
 
         .video-container iframe {
             width: 100%;
-            aspect-ratio: 16 / 9; 
+            height: 100%;
             border: none;
-            pointer-events: none; /* iframe ထဲသို့ Direct Interaction/Click စီးဆင်းမသွားစေရန် တားဆီးခြင်း */
+            pointer-events: none;
             transform-origin: center center;
             transition: filter 0.1s ease, transform 0.05s ease-out;
+        }
+
+        /* In-Player Scrubber Progress Bar Overlay */
+        .progress-overlay-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 55;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            padding: 8px 12px 6px 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .progress-bar-container {
+            position: relative;
+            width: 100%;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-color);
+            border-radius: 3px;
+            width: 0%;
+        }
+
+        .seek-input {
+            position: absolute;
+            top: -5px;
+            left: 0;
+            width: 100%;
+            height: 15px;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 60;
+            margin: 0;
         }
 
         /* Fullscreen Mode Optimization */
@@ -144,7 +192,7 @@
                 padding: 0;
                 background-color: #000;
             }
-            .header-text, .controls-bar {
+            .header-text, .controls-bar, .playlist-section {
                 display: none !important;
             }
             .video-container {
@@ -157,6 +205,7 @@
             }
         }
 
+        /* Control Panel Bar */
         .controls-bar {
             margin-top: 15px;
             display: flex;
@@ -164,6 +213,7 @@
             align-items: center;
             gap: 8px;
             width: 100%;
+            max-width: 800px;
             flex-wrap: wrap;
         }
 
@@ -201,6 +251,75 @@
         .btn-control:active {
             opacity: 0.8;
         }
+
+        .time-text {
+            font-size: 0.8rem;
+            color: var(--text-color);
+            font-family: monospace;
+            padding: 6px 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+        }
+
+        /* Playlist Queue Section */
+        .playlist-section {
+            width: 100%;
+            max-width: 800px;
+            margin-top: 20px;
+        }
+
+        .playlist-title {
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: var(--text-color);
+        }
+
+        .video-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .video-card {
+            display: flex;
+            gap: 12px;
+            background: var(--card-bg);
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .video-card:active, .video-card.active {
+            background: #333;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .video-thumb {
+            width: 110px;
+            aspect-ratio: 16 / 9;
+            border-radius: 6px;
+            object-fit: cover;
+        }
+
+        .video-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .video-info h4 {
+            margin: 0 0 4px 0;
+            font-size: 0.9rem;
+            color: #ffffff;
+        }
+
+        .video-info p {
+            margin: 0;
+            font-size: 0.75rem;
+            color: var(--hint-color);
+        }
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -210,12 +329,11 @@
         <p>Bot ကို စတင်အသုံးပြုပုံနှင့် Signal များဖတ်နည်း လမ်းညွှန် ဗီဒီယိုများ</p>
     </div>
 
+    <!-- Video Player Container -->
     <div class="video-container" id="videoBox">
-        <!-- Full Overlay Shield (ခလုတ်နှိပ်ခြင်း၊ ဖိထားခြင်း၊ Link ကူးခြင်း လုံးဝ မရအောင် ကာကွယ်ထားသည်) -->
         <div class="full-shield-overlay" id="gestureOverlay"></div>
         <div class="hud-indicator" id="hudIndicator"></div>
 
-        <!-- Youtube No-Cookie Embed with controls=0, disablekb=1, showinfo=0 -->
         <iframe 
             id="ytPlayer"
             src="https://www.youtube-nocookie.com/embed/videoseries?list=PLATyixI4j2D8&enablejsapi=1&rel=0&controls=0&showinfo=0&iv_load_policy=3&modestbranding=1&disablekb=1&hl=my&cc_lang_pref=my&cc_load_policy=1" 
@@ -223,11 +341,20 @@
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
             allowfullscreen>
         </iframe>
+
+        <!-- In-Player Progress Timeline Overlay -->
+        <div class="progress-overlay-bar">
+            <div class="progress-bar-container">
+                <div class="progress-fill" id="progressFill"></div>
+                <input type="range" class="seek-input" id="seekInput" min="0" max="100" value="0" step="0.1">
+            </div>
+        </div>
     </div>
 
+    <!-- Control Buttons Panel -->
     <div class="controls-bar" id="controlsBar">
         <button class="btn-control" onclick="prevVideo()">⏮ ရှေ့တစ်ပုဒ်</button>
-        <button class="btn-control" onclick="togglePlayPause()"><span id="playStateIcon">⏯</span> သင်္ကေတ</button>
+        <button class="btn-control" onclick="togglePlayPause()"><span id="playStateIcon">▶</span> သင်္ကေတ</button>
         <button class="btn-control" onclick="nextVideo()">နောက်တစ်ပုဒ် ⏭</button>
 
         <select class="btn-control" id="subtitleSelect" onchange="changeSubtitle(this.value)">
@@ -252,6 +379,14 @@
         <button class="btn-control" onclick="toggleManualFullscreen()">
             <span id="btnIcon">⛶</span> <span id="btnText">မျက်နှာပြင် အပြည့်ကြည့်မည် (Zoom)</span>
         </button>
+
+        <span class="time-text" id="timeDisplay">00:00 / 00:00</span>
+    </div>
+
+    <!-- Continuous Playlist Queue Section -->
+    <div class="playlist-section">
+        <div class="playlist-title">📚 လမ်းညွှန် ဗီဒီယိုများ စာရင်း</div>
+        <div class="video-list" id="videoListContainer"></div>
     </div>
 
     <script>
@@ -268,10 +403,23 @@
         const ttsBtn = document.getElementById('ttsBtn');
         const btnText = document.getElementById('btnText');
         const btnIcon = document.getElementById('btnIcon');
+        const playStateIcon = document.getElementById('playStateIcon');
+        const progressFill = document.getElementById('progressFill');
+        const seekInput = document.getElementById('seekInput');
+        const timeDisplay = document.getElementById('timeDisplay');
+
+        // Playlist Data Queue
+        const playlistData = [
+            { id: "M7lc1UVf-VE", title: "၁။ Overlord Bot အခြေခံ အသုံးပြုနည်း", duration: "05:20" },
+            { id: "L_LUpnjgPso", title: "၂။ Signal များဖတ်ပြီး Trade ဝင်နည်း", duration: "08:15" },
+            { id: "fJ9rUzIMcZQ", title: "၃။ Risk Management နှင့် Stop Loss ပြင်ဆင်နည်း", duration: "06:40" }
+        ];
 
         let player;
         let isPlayerReady = false;
         let isVoiceOverEnabled = false;
+        let currentVideoIndex = 0;
+        let isSeeking = false;
 
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('ytPlayer', {
@@ -279,10 +427,31 @@
                     'onReady': () => { 
                         isPlayerReady = true; 
                         updateQualityMenu();
+                        renderPlaylist();
+
+                        // Resume position & Video from LocalStorage
+                        const savedVideoId = localStorage.getItem('last_yt_id');
+                        const savedTime = localStorage.getItem('last_yt_time');
+
+                        if (savedVideoId) {
+                            const idx = playlistData.findIndex(v => v.id === savedVideoId);
+                            if (idx !== -1) currentVideoIndex = idx;
+                            player.loadVideoById(savedVideoId, parseFloat(savedTime) || 0);
+                        }
+
+                        startProgressLoop();
                     },
                     'onStateChange': (event) => {
                         if (event.data === YT.PlayerState.PLAYING) {
                             updateQualityMenu();
+                            playStateIcon.textContent = '⏸';
+                        } else {
+                            playStateIcon.textContent = '▶';
+                        }
+
+                        // Auto Play Next Video on End
+                        if (event.data === YT.PlayerState.ENDED) {
+                            nextVideo();
                         }
                     }
                 }
@@ -302,7 +471,98 @@
             }
         });
 
-        // Speech Engine
+        // Playlist Queue Functions
+        function renderPlaylist() {
+            const container = document.getElementById('videoListContainer');
+            container.innerHTML = '';
+            playlistData.forEach((vid, index) => {
+                const card = document.createElement('div');
+                card.className = `video-card ${index === currentVideoIndex ? 'active' : ''}`;
+                card.onclick = () => playVideoAtIndex(index);
+                card.innerHTML = `
+                    <img class="video-thumb" src="https://img.youtube.com/vi/${vid.id}/mqdefault.jpg">
+                    <div class="video-info">
+                        <h4>${vid.title}</h4>
+                        <p>⏱ ကြာချိန် - ${vid.duration}</p>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function playVideoAtIndex(index) {
+            if (!isPlayerReady) return;
+            currentVideoIndex = index;
+            const vid = playlistData[index];
+            player.loadVideoById(vid.id);
+            renderPlaylist();
+            showHUD(`▶ ${vid.title}`);
+        }
+
+        function nextVideo() {
+            if (!isPlayerReady) return;
+            if (currentVideoIndex < playlistData.length - 1) {
+                playVideoAtIndex(currentVideoIndex + 1);
+            } else if (player.nextVideo) {
+                player.nextVideo();
+            }
+            showHUD("⏭ နောက်တစ်ပုဒ်");
+        }
+
+        function prevVideo() {
+            if (!isPlayerReady) return;
+            if (currentVideoIndex > 0) {
+                playVideoAtIndex(currentVideoIndex - 1);
+            } else if (player.previousVideo) {
+                player.previousVideo();
+            }
+            showHUD("⏮ ရှေ့တစ်ပုဒ်");
+        }
+
+        // Timeline Progress Bar Scrubber
+        seekInput.addEventListener('input', (e) => {
+            isSeeking = true;
+            progressFill.style.width = e.target.value + '%';
+        });
+
+        seekInput.addEventListener('change', (e) => {
+            if (isPlayerReady) {
+                const duration = player.getDuration();
+                const seekToSec = (e.target.value / 100) * duration;
+                player.seekTo(seekToSec, true);
+            }
+            isSeeking = false;
+        });
+
+        function startProgressLoop() {
+            setInterval(() => {
+                if (isPlayerReady && !isSeeking && player.getPlayerState() === YT.PlayerState.PLAYING) {
+                    const current = player.getCurrentTime();
+                    const duration = player.getDuration();
+                    if (duration > 0) {
+                        const pct = (current / duration) * 100;
+                        progressFill.style.width = pct + '%';
+                        seekInput.value = pct;
+                        timeDisplay.textContent = `${formatTime(current)} / ${formatTime(duration)}`;
+                        
+                        // Storage Resume Feature
+                        if (playlistData[currentVideoIndex]) {
+                            localStorage.setItem('last_yt_id', playlistData[currentVideoIndex].id);
+                            localStorage.setItem('last_yt_time', current);
+                        }
+                    }
+                }
+            }, 500);
+        }
+
+        function formatTime(sec) {
+            if (isNaN(sec) || sec < 0) return "00:00";
+            const m = Math.floor(sec / 60);
+            const s = Math.floor(sec % 60);
+            return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        // Speech Engine (TTS)
         function speakText(text, lang = 'en-US') {
             if (!('speechSynthesis' in window) || !isVoiceOverEnabled) return;
             window.speechSynthesis.cancel();
@@ -371,7 +631,7 @@
             showHUD(`⚙️ Quality: ${formatQualityName(val)}`);
         }
 
-        // Gesture Logic
+        // Touch Gesture Logic
         let touchStartX = 0, touchStartY = 0;
         let currentBrightness = 1.0, currentVolume = 100, currentZoom = 1.0;
         let initialPinchDist = 0, lastTapTime = 0, tapTimeout;
@@ -492,20 +752,6 @@
             } else {
                 player.playVideo();
                 showHUD("▶ Playing");
-            }
-        }
-
-        function nextVideo() {
-            if (isPlayerReady && player.nextVideo) {
-                player.nextVideo();
-                showHUD("⏭ နောက်တစ်ပုဒ်");
-            }
-        }
-
-        function prevVideo() {
-            if (isPlayerReady && player.previousVideo) {
-                player.previousVideo();
-                showHUD("⏮ ရှေ့တစ်ပုဒ်");
             }
         }
 
