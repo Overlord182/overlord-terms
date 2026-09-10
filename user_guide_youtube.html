@@ -8,6 +8,8 @@
 
     <!-- Telegram WebApp JS SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- YouTube Iframe API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
 
     <style>
         :root {
@@ -28,6 +30,13 @@
             min-height: 100vh;
             padding-top: calc(15px + env(safe-area-inset-top));
             padding-bottom: calc(15px + env(safe-area-inset-bottom));
+
+            /* Copy / Text Selection & Long Press တားဆီးရန် CSS */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
         }
 
         .header-text {
@@ -62,12 +71,62 @@
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             transition: all 0.3s ease;
+            touch-action: none;
+        }
+
+        /* YouTube Title/Share Button ကို နှိပ်၍ Link ယူမရအောင် အပေါ်မှ အုပ်ပေးသည့် Transparent Layer */
+        .yt-click-blocker {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px; /* YouTube Header / Title ဧရိယာ */
+            z-index: 20;
+            background: transparent;
+        }
+
+        /* Touch Gestures (Volume, Brightness, Zoom, Seek) အတွက် Overlay */
+        .gesture-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 15;
+            touch-action: none;
+        }
+
+        /* Gestures ပြုလုပ်သည့်အခါ မျက်နှာပြင်အလယ်တွင် စာသားပြပေးသည့် HUD Indicator */
+        .hud-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: #ffffff;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            pointer-events: none;
+            z-index: 25;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .hud-indicator.show {
+            opacity: 1;
         }
 
         .video-container iframe {
             width: 100%;
             aspect-ratio: 16 / 9; 
             border: none;
+            transform-origin: center center;
+            transition: filter 0.1s ease, transform 0.05s ease-out;
         }
 
         /* Pure CSS Fullscreen Mode (iOS / Android နှစ်ခုလုံးအတွက်) */
@@ -95,7 +154,7 @@
                 background-color: #000;
             }
             .header-text, .controls-bar {
-                display: none !important; /* လှည့်လိုက်ပါက စာနှင့် Button များကို ဖျောက်၍ ဗီဒီယိုကို တစ်ပြင်လုံးပြမည် */
+                display: none !important;
             }
             .video-container {
                 max-width: 100vw;
@@ -111,14 +170,17 @@
             margin-top: 15px;
             display: flex;
             justify-content: center;
+            align-items: center;
+            gap: 8px;
             width: 100%;
+            flex-wrap: wrap;
         }
 
-        .btn-fullscreen {
+        .btn-control {
             background-color: var(--btn-color);
             color: var(--btn-text-color);
             border: none;
-            padding: 10px 20px;
+            padding: 10px 14px;
             border-radius: 8px;
             font-size: 0.85rem;
             font-weight: bold;
@@ -126,15 +188,31 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
+            outline: none;
         }
 
-        .btn-fullscreen:active {
+        select.btn-control {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            padding-right: 26px;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 6px center;
+            background-size: 16px;
+        }
+
+        .btn-control.active {
+            background-color: #28a745;
+        }
+
+        .btn-control:active {
             opacity: 0.8;
         }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
 
     <div class="header-text" id="headerText">
         <h2>Overlord Bot အသုံးပြုနည်း လမ်းညွှန်</h2>
@@ -142,14 +220,15 @@
     </div>
 
     <div class="video-container" id="videoBox">
-        <!-- 
-            YouTube Native Playlist Embed: 
-            list= ရဲ့ အနောက်မှာ မိမိ YouTube Playlist ID အမှန်ကို အစားထိုးပေးရပါမည်။
-            (ဥပမာ - list=PLATyixI4j2D8 နေရာတွင် မိမိ ID ပြောင်းရန်)
-        -->
+        <!-- Click Blocker Layer (YouTube Title နှင့် Share ခလုတ်များကို မနှိပ်နိုင်အောင် အပေါ်မှ ကာကွယ်ပေးသည်) -->
+        <div class="yt-click-blocker"></div>
+        <div class="gesture-overlay" id="gestureOverlay"></div>
+        <div class="hud-indicator" id="hudIndicator"></div>
+
+        <!-- Parameters Added: hl=my (Myanmar UI), cc_lang_pref=my (Subtitle Preference), cc_load_policy=1 (Enable CC) -->
         <iframe 
             id="ytPlayer"
-            src="https://www.youtube.com/embed/videoseries?list=PLATyixI4j2D8&enablejsapi=1" 
+            src="https://www.youtube.com/embed/videoseries?list=PLATyixI4j2D8&enablejsapi=1&rel=0&modestbranding=1&hl=my&cc_lang_pref=my&cc_load_policy=1" 
             title="Overlord Bot Guide" 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
             allowfullscreen>
@@ -157,7 +236,33 @@
     </div>
 
     <div class="controls-bar" id="controlsBar">
-        <button class="btn-fullscreen" onclick="toggleManualFullscreen()">
+        <button class="btn-control" onclick="prevVideo()"> ရှေ့တစ်ပုဒ်</button>
+        <button class="btn-control" onclick="togglePlayPause()"><span id="playStateIcon"></span> သင်္ကေတ</button>
+        <button class="btn-control" onclick="nextVideo()">နောက်တစ်ပုဒ် </button>
+
+        <!-- Subtitles Language Selector -->
+        <select class="btn-control" id="subtitleSelect" onchange="changeSubtitle(this.value)">
+            <option value="off"> CC: ပိတ်မည်</option>
+            <option value="my"> မြန်မာစာတန်းထိုး</option>
+            <option value="en"> English Subtitle</option>
+            <option value="th">  Subtitle</option>
+            <option value="ja">  Subtitle</option>
+            <option value="ko">  Subtitle</option>
+        </select>
+
+        <!-- Browser Voice Text-to-Speech Toggle -->
+        <button class="btn-control" id="ttsBtn" onclick="toggleVoiceOver()"> Voice: Off</button>
+
+        <!-- Quality Selector -->
+        <select class="btn-control" id="qualitySelect" onchange="changeQuality(this.value)">
+            <option value="auto"> Quality: Auto</option>
+            <option value="hd1080"> 1080p (HD)</option>
+            <option value="hd720"> 720p (HD)</option>
+            <option value="large"> 480p</option>
+            <option value="medium"> 360p</option>
+        </select>
+
+        <button class="btn-control" onclick="toggleManualFullscreen()">
             <span id="btnIcon"></span> <span id="btnText">မျက်နှာပြင် အပြည့်ကြည့်မည် (Zoom)</span>
         </button>
     </div>
@@ -168,12 +273,269 @@
         tg.expand();
 
         const videoBox = document.getElementById('videoBox');
+        const ytIframe = document.getElementById('ytPlayer');
+        const gestureOverlay = document.getElementById('gestureOverlay');
+        const hudIndicator = document.getElementById('hudIndicator');
+        const qualitySelect = document.getElementById('qualitySelect');
+        const subtitleSelect = document.getElementById('subtitleSelect');
+        const ttsBtn = document.getElementById('ttsBtn');
         const btnText = document.getElementById('btnText');
         const btnIcon = document.getElementById('btnIcon');
 
-        // Toggle Fullscreen System (CSS-based + Native Fallback)
+        let player;
+        let isPlayerReady = false;
+        let isVoiceOverEnabled = false;
+
+        // YouTube Iframe API Init
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('ytPlayer', {
+                events: {
+                    'onReady': () => { 
+                        isPlayerReady = true; 
+                        updateQualityMenu();
+                    },
+                    'onStateChange': (event) => {
+                        if (event.data === YT.PlayerState.PLAYING) {
+                            updateQualityMenu();
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- Link Protection / Copy Prevention Event Listeners ---
+        // ၁။ Right Click / Long Press Context Menu ပိတ်ခြင်း
+        document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+        // ၂။ Drag & Drop (ပုံ သို့မဟုတ် iframe ဆွဲယူခြင်း) ပိတ်ခြင်း
+        document.addEventListener('dragstart', (e) => e.preventDefault());
+
+        // ၃။ Keyboard Shortcut များ (F12, Ctrl+U, Ctrl+Shift+I, Ctrl+C) ပိတ်ခြင်း
+        document.addEventListener('keydown', (e) => {
+            if (
+                e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j')) ||
+                (e.ctrlKey && (e.key === 'U' || e.key === 'u' || e.key === 'C' || e.key === 'c' || e.key === 'S' || e.key === 's'))
+            ) {
+                e.preventDefault();
+            }
+        });
+
+        // --- Web Speech API (Text-to-Speech Engine) ---
+        function speakText(text, lang = 'en-US') {
+            if (!('speechSynthesis' in window) || !isVoiceOverEnabled) return;
+            window.speechSynthesis.cancel(); // Stop ongoing speech
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = lang;
+            utterance.rate = 1.0;
+            utterance.pitch = 1.0;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function toggleVoiceOver() {
+            isVoiceOverEnabled = !isVoiceOverEnabled;
+            if (isVoiceOverEnabled) {
+                ttsBtn.classList.add('active');
+                ttsBtn.textContent = " Voice: On";
+                showHUD(" Voice Read Aloud: Enabled");
+                speakText("Voice readout enabled", "en-US");
+            } else {
+                ttsBtn.classList.remove('active');
+                ttsBtn.textContent = " Voice: Off";
+                showHUD(" Voice Read Aloud: Disabled");
+                window.speechSynthesis.cancel();
+            }
+        }
+
+        // Subtitles Logic
+        function changeSubtitle(langCode) {
+            if (!isPlayerReady) return;
+
+            if (langCode === 'off') {
+                player.unloadModule('captions');
+                player.setOption('captions', 'track', {});
+                showHUD(" စာတန်းထိုး: ပိတ်ပါသည်");
+            } else {
+                player.loadModule('captions');
+                player.setOption('captions', 'track', {'languageCode': langCode});
+                const selectedText = subtitleSelect.options[subtitleSelect.selectedIndex].text;
+                showHUD(`${selectedText}`);
+                
+                if (isVoiceOverEnabled) {
+                    speakText(`Subtitle changed to ${langCode}`, 'en-US');
+                }
+            }
+        }
+
+        // Quality Logic
+        function updateQualityMenu() {
+            if (!isPlayerReady) return;
+            try {
+                const qualities = player.getAvailableQualityLevels();
+                if (qualities && qualities.length > 0) {
+                    const currentQual = player.getPlaybackQuality();
+                    qualitySelect.innerHTML = '';
+                    qualities.forEach(q => {
+                        const opt = document.createElement('option');
+                        opt.value = q;
+                        opt.textContent = ` ${formatQualityName(q)}`;
+                        if (q === currentQual) opt.selected = true;
+                        qualitySelect.appendChild(opt);
+                    });
+                }
+            } catch(e) {}
+        }
+
+        function formatQualityName(q) {
+            const names = {
+                'highres': '4K / 2K',
+                'hd1080': '1080p (HD)',
+                'hd720': '720p (HD)',
+                'large': '480p',
+                'medium': '360p',
+                'small': '240p',
+                'tiny': '144p',
+                'auto': 'Auto'
+            };
+            return names[q] || q;
+        }
+
+        function changeQuality(val) {
+            if (!isPlayerReady) return;
+            player.setPlaybackQuality(val);
+            showHUD(` Quality: ${formatQualityName(val)}`);
+        }
+
+        // Touch Gestures State
+        let touchStartX = 0, touchStartY = 0;
+        let currentBrightness = 1.0, currentVolume = 100, currentZoom = 1.0;
+        let initialPinchDist = 0, lastTapTime = 0;
+        let isSeekingGesture = false, isVolumeGesture = false, isBrightnessGesture = false;
+        let seekDeltaTime = 0, hudTimeout;
+
+        function showHUD(text) {
+            hudIndicator.textContent = text;
+            hudIndicator.classList.add('show');
+            clearTimeout(hudTimeout);
+            hudTimeout = setTimeout(() => hudIndicator.classList.remove('show'), 1000);
+        }
+
+        function getDistance(t1, t2) {
+            return Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+        }
+
+        gestureOverlay.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                initialPinchDist = getDistance(e.touches[0], e.touches[1]);
+            } else if (e.touches.length === 1) {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+                isSeekingGesture = isVolumeGesture = isBrightnessGesture = false;
+
+                const currentTime = new Date().getTime();
+                if (currentTime - lastTapTime < 300) {
+                    handleDoubleTap(touchStartX);
+                }
+                lastTapTime = currentTime;
+            }
+        }, { passive: true });
+
+        gestureOverlay.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2) {
+                const newDist = getDistance(e.touches[0], e.touches[1]);
+                if (initialPinchDist > 0) {
+                    currentZoom = Math.min(Math.max(1.0, currentZoom * (newDist / initialPinchDist)), 3.0);
+                    ytIframe.style.transform = `scale(${currentZoom})`;
+                    showHUD(` Zoom: ${currentZoom.toFixed(1)}x`);
+                    initialPinchDist = newDist;
+                }
+            } else if (e.touches.length === 1) {
+                const diffX = e.touches[0].clientX - touchStartX;
+                const diffY = e.touches[0].clientY - touchStartY;
+                const rect = gestureOverlay.getBoundingClientRect();
+
+                if (!isSeekingGesture && !isVolumeGesture && !isBrightnessGesture) {
+                    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 15) {
+                        isSeekingGesture = true;
+                    } else if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 15) {
+                        if (touchStartX < rect.width / 2) isBrightnessGesture = true;
+                        else isVolumeGesture = true;
+                    }
+                }
+
+                if (isBrightnessGesture) {
+                    currentBrightness = Math.min(Math.max(0.2, currentBrightness - diffY * 0.003), 1.5);
+                    ytIframe.style.filter = `brightness(${currentBrightness})`;
+                    showHUD(` Brightness: ${Math.round((currentBrightness / 1.5) * 100)}%`);
+                    touchStartY = e.touches[0].clientY;
+                }
+
+                if (isVolumeGesture && isPlayerReady) {
+                    currentVolume = Math.min(Math.max(0, currentVolume - diffY * 0.2), 100);
+                    player.setVolume(currentVolume);
+                    showHUD(` Volume: ${Math.round(currentVolume)}%`);
+                    touchStartY = e.touches[0].clientY;
+                }
+
+                if (isSeekingGesture) {
+                    seekDeltaTime = Math.round(diffX * 0.15);
+                    showHUD(`${seekDeltaTime > 0 ? " +" : " "}${seekDeltaTime}s`);
+                }
+            }
+        }, { passive: true });
+
+        gestureOverlay.addEventListener('touchend', () => {
+            if (isSeekingGesture && isPlayerReady && seekDeltaTime !== 0) {
+                player.seekTo(player.getCurrentTime() + seekDeltaTime, true);
+                seekDeltaTime = 0;
+            }
+            isSeekingGesture = isVolumeGesture = isBrightnessGesture = false;
+        });
+
+        function handleDoubleTap(xPos) {
+            if (!isPlayerReady) return;
+            const rect = gestureOverlay.getBoundingClientRect();
+            const currentTime = player.getCurrentTime();
+
+            if (xPos < rect.width * 0.35) {
+                player.seekTo(currentTime - 10, true);
+                showHUD(" -10 Seconds");
+            } else if (xPos > rect.width * 0.65) {
+                player.seekTo(currentTime + 10, true);
+                showHUD(" +10 Seconds");
+            } else {
+                togglePlayPause();
+            }
+        }
+
+        function togglePlayPause() {
+            if (!isPlayerReady) return;
+            if (player.getPlayerState() === YT.PlayerState.PLAYING) {
+                player.pauseVideo();
+                showHUD(" Paused");
+            } else {
+                player.playVideo();
+                showHUD(" Playing");
+            }
+        }
+
+        function nextVideo() {
+            if (isPlayerReady && player.nextVideo) {
+                player.nextVideo();
+                showHUD(" နောက်တစ်ပုဒ်");
+            }
+        }
+
+        function prevVideo() {
+            if (isPlayerReady && player.previousVideo) {
+                player.previousVideo();
+                showHUD(" ရှေ့တစ်ပုဒ်");
+            }
+        }
+
+        // Toggle Fullscreen System
         function toggleManualFullscreen() {
-            // Telegram Haptic Feedback
             if (tg.HapticFeedback) {
                 tg.HapticFeedback.impactOccurred('medium');
             }
@@ -181,17 +543,14 @@
             const isFullscreen = videoBox.classList.contains('custom-fullscreen');
 
             if (!isFullscreen) {
-                // Open Fullscreen
                 videoBox.classList.add('custom-fullscreen');
                 btnText.textContent = "ပုံမှန်အတိုင်း ပြန်ထားမည်";
                 btnIcon.textContent = "";
 
-                // Native API ကူညီနိုင်ပါက ခေါ်မည် (Android အတွက်)
                 if (videoBox.requestFullscreen) {
                     videoBox.requestFullscreen().catch(() => {});
                 }
             } else {
-                // Exit Fullscreen
                 videoBox.classList.remove('custom-fullscreen');
                 btnText.textContent = "မျက်နှာပြင် အပြည့်ကြည့်မည် (Zoom)";
                 btnIcon.textContent = "";
@@ -202,7 +561,6 @@
             }
         }
 
-        // ESC / Native Back Button နှိပ်ပါက Fullscreen ပြန်ထွက်ရန်
         document.addEventListener("fullscreenchange", () => {
             if (!document.fullscreenElement) {
                 videoBox.classList.remove('custom-fullscreen');
