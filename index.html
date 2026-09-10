@@ -15,15 +15,17 @@
 
     <style>
         :root {
-            --bg-color: #f8fafc;
-            --card-bg: #ffffff;
-            --text-primary: #0f172a;
-            --text-secondary: #475569;
+            /* Telegram Theme Variables with Default Fallbacks */
+            --bg-color: var(--tg-theme-secondary-bg-color, #f8fafc);
+            --card-bg: var(--tg-theme-bg-color, #ffffff);
+            --text-primary: var(--tg-theme-text-color, #0f172a);
+            --text-secondary: var(--tg-theme-hint-color, #475569);
             --brand-color: #1e3a8a;
-            --accent-color: #2563eb;
+            --accent-color: var(--tg-theme-button-color, #2563eb);
             --border-color: #e2e8f0;
             --success-color: #16a34a;
             --danger-color: #dc2626;
+            --tos-bg: var(--tg-theme-secondary-bg-color, #f8fafc);
         }
 
         body { 
@@ -82,7 +84,7 @@
         }
 
         .tos-content {
-            background: #f8fafc;
+            background: var(--tos-bg);
             border: 1px solid var(--border-color);
             border-radius: 14px;
             padding: 24px;
@@ -122,7 +124,7 @@
         }
 
         .section-title {
-            background: linear-gradient(90deg, #eff6ff 0%, #ffffff 100%);
+            background: linear-gradient(90deg, #eff6ff 0%, var(--card-bg) 100%);
             color: var(--brand-color);
             padding: 8px 14px;
             border-left: 4px solid var(--accent-color);
@@ -199,7 +201,7 @@
         }
 
         .action-box {
-            background: #ffffff;
+            background: var(--card-bg);
             border-radius: 14px;
             padding: 20px;
             border: 1px solid var(--border-color);
@@ -258,9 +260,6 @@
             transition: 0.2s ease;
         }
 
-        /* -------------------------------------------------------------
-           PDF / Print ရိုက်ထုတ်စဉ် မြန်မာစာ ၁၀၀% မှန်ကန်စေရန် Print CSS
-        ------------------------------------------------------------- */
         @media print {
             body {
                 background-color: #ffffff !important;
@@ -551,12 +550,18 @@
     </div>
 
     <script>
+        // 1. Telegram WebApp Initialization
         const tg = window.Telegram ? window.Telegram.WebApp : null;
         if (tg) {
             tg.ready();
             tg.expand();
         }
 
+        // 2. Query Parameters Fallback
+        const urlParams = new URLSearchParams(window.location.search);
+        const userIdFromUrl = urlParams.get('user_id');
+
+        // DOM Elements
         const tosContent = document.getElementById('tosContent');
         const scrollHint = document.getElementById('scrollHint');
         const checkbox = document.getElementById('agreeCheckbox');
@@ -565,120 +570,147 @@
         const rejectBtn = document.getElementById('rejectBtn');
         const downloadPdfBtn = document.getElementById('downloadPdfBtn');
 
-        // Scroll to bottom detection
         let hasScrolledToBottom = false;
 
-        tosContent.addEventListener('scroll', function() {
+        // Function to Unlock Checkbox
+        function unlockCheckbox() {
             if (!hasScrolledToBottom) {
-                const isBottom = Math.ceil(tosContent.scrollTop + tosContent.clientHeight) >= tosContent.scrollHeight - 35;
-                if (isBottom) {
-                    hasScrolledToBottom = true;
-                    checkbox.disabled = false;
-                    checkboxLabel.classList.remove('disabled');
-                    scrollHint.style.color = '#16a34a';
-                    scrollHint.style.background = '#f0fdf4';
-                    scrollHint.style.borderColor = '#bbf7d0';
-                    scrollHint.innerText = '✅ စည်းမျဉ်းများကို အပြည့်အစုံ ဖတ်ရှုပြီးပါပြီ။ အမှန်ခြစ်နိုင်ပါပြီ။';
-                }
+                hasScrolledToBottom = true;
+                checkbox.disabled = false;
+                checkboxLabel.classList.remove('disabled');
+                scrollHint.style.background = '#f0fdf4';
+                scrollHint.style.borderColor = '#bbf7d0';
+                scrollHint.style.color = '#16a34a';
+                scrollHint.innerHTML = '✅ စည်းမျဉ်းများကို အပြည့်အစုံ ဖတ်ရှုပြီးပါပြီ။ အောက်ပါ Checkbox တွင် အမှန်ခြစ်ပါ။';
             }
+        }
+
+        // Check if Scroll is needed (for Large Displays/Tablets)
+        function checkInitialScrollState() {
+            if (tosContent.scrollHeight <= tosContent.clientHeight + 25) {
+                unlockCheckbox();
+            }
+        }
+
+        // 3. Scroll Event Listener
+        tosContent.addEventListener('scroll', function() {
+            const isBottom = Math.ceil(tosContent.scrollTop + tosContent.clientHeight) >= tosContent.scrollHeight - 35;
+            if (isBottom) unlockCheckbox();
         });
 
-        // Native Browser Print Logic (Handles Myanmar CTL Fonts 100% Correctly)
-        downloadPdfBtn.addEventListener('click', function() {
-            window.print();
-        });
+        // Trigger Scroll Check on Page Load
+        window.addEventListener('load', checkInitialScrollState);
+        window.addEventListener('resize', checkInitialScrollState);
 
-        // Checkbox interaction
+        // 4. Checkbox State Change
         checkbox.addEventListener('change', function() {
-            if (this.checked && hasScrolledToBottom) {
-                confirmBtn.disabled = false;
-                confirmBtn.style.cursor = 'pointer';
-                confirmBtn.style.opacity = '1';
-            } else {
-                confirmBtn.disabled = true;
-                confirmBtn.style.cursor = 'not-allowed';
-                confirmBtn.style.opacity = '0.5';
-            }
+            confirmBtn.disabled = !this.checked;
+            confirmBtn.style.cursor = this.checked ? 'pointer' : 'not-allowed';
+            confirmBtn.style.opacity = this.checked ? '1' : '0.5';
         });
 
-        // API Submission Handlers
-        const WORKER_API_URL = 'https://your-worker-subdomain.workers.dev/api/tos-agree';
+        // 5. Print/PDF Download Trigger
+        downloadPdfBtn.addEventListener('click', () => window.print());
 
-        confirmBtn.addEventListener('click', async function() {
-            if (!checkbox.checked || !hasScrolledToBottom) return;
+        // 6. API Interaction Handler (With Loading States)
+        async function sendTosAction(actionType) {
+            
+            // 👈 (အသစ်ထည့်ထားသည်) နှိပ်လိုက်တာနဲ့ ဖုန်းလေးတုန်သွားအောင် Haptic Feedback ပေးခြင်း
+            if (tg && tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('medium');
+            }
 
+            const initData = tg ? tg.initData : '';
+            
+            // Disable buttons & show loading feedback
             confirmBtn.disabled = true;
             rejectBtn.disabled = true;
-            confirmBtn.innerText = "ခဏစောင့်ပါ...";
+            
+            const originalConfirmText = confirmBtn.innerText;
+            const originalRejectText = rejectBtn.innerText;
+            
+            if (actionType === 'tos_agree') {
+                confirmBtn.innerText = "ခဏစောင့်ပါ...";
+            } else {
+                rejectBtn.innerText = "ခဏစောင့်ပါ...";
+            }
 
             const payload = {
-                status: "ACCEPTED",
-                action: "tos_agree",
-                initData: tg ? tg.initData : "",
-                timestamp: new Date().toISOString()
+                initData: initData,
+                user_id: userIdFromUrl,
+                action: actionType
             };
 
-            let isSuccess = false;
-
             try {
-                const response = await fetch(WORKER_API_URL, {
+                // 👈 (ပြင်ဆင်ထားသည်) ဒီနေရာမှာ အစ်ကို့ရဲ့ တကယ့် Cloudflare Worker URL ကို အစားထိုးထည့်ပေးပါ
+                const apiUrl = 'https://your-worker-name.your-username.workers.dev/api/tos-agree';
+
+                // Cloudflare Worker API Endpoint သို့ ပို့ခြင်း
+                const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                if (response.ok) isSuccess = true;
-            } catch (err) {
-                console.error("API Error:", err);
-            }
 
-            if (tg) {
-                try {
-                    tg.sendData(JSON.stringify(payload));
-                    isSuccess = true;
-                } catch (e) {}
-            }
+                const result = await response.json();
 
-            if (isSuccess) {
-                if (tg) {
-                    tg.close();
+                if (response.ok && result.success) {
+                    
+                    // 👈 (အသစ်ထည့်ထားသည်) လုပ်ဆောင်မှု အောင်မြင်ကြောင်း တုန်ခါမှုပေးခြင်း
+                    if (tg && tg.HapticFeedback) {
+                        tg.HapticFeedback.notificationOccurred('success'); 
+                    }
+
+                    const message = actionType === 'tos_agree' 
+                        ? "✅ စည်းမျဉ်းများကို လက်ခံအတည်ပြုပြီးပါပြီ။" 
+                        : "❌ စည်းမျဉ်းများကို ငြင်းပယ်လိုက်ပါသည်။";
+
+                    if (tg) {
+                        tg.showAlert(message, () => tg.close());
+                    } else {
+                        alert(message);
+                    }
                 } else {
-                    alert('လက်ခံပြီးပါပြီ။ ကျေးဇူးပြု၍ Telegram Chat သို့ ပြန်သွားနိုင်ပါသည်။');
+                    
+                    // 👈 (အသစ်ထည့်ထားသည်) Error တက်ကြောင်း တုန်ခါမှုပေးခြင်း (Optional)
+                    if (tg && tg.HapticFeedback) {
+                        tg.HapticFeedback.notificationOccurred('error'); 
+                    }
+
+                    const errorMsg = result.error || "လုပ်ဆောင်မှု မအောင်မြင်ပါ။";
+                    tg ? tg.showAlert("⚠️ Error: " + errorMsg) : alert("⚠️ Error: " + errorMsg);
+                    
+                    // Reset UI
+                    confirmBtn.innerText = originalConfirmText;
+                    rejectBtn.innerText = originalRejectText;
+                    confirmBtn.disabled = !checkbox.checked;
+                    rejectBtn.disabled = false;
                 }
-            } else {
-                alert('ချိတ်ဆက်မှု မအောင်မြင်ပါ။ ပြန်လည်ကြိုးစားပါ။');
-                confirmBtn.disabled = false;
+            } catch (err) {
+                
+                // 👈 (အသစ်ထည့်ထားသည်) Network Error တက်ကြောင်း တုန်ခါမှုပေးခြင်း (Optional)
+                if (tg && tg.HapticFeedback) {
+                    tg.HapticFeedback.notificationOccurred('error'); 
+                }
+
+                const netErr = "Network Error: " + err.message;
+                tg ? tg.showAlert("⚠️ " + netErr) : alert("⚠️ " + netErr);
+                
+                // Reset UI
+                confirmBtn.innerText = originalConfirmText;
+                rejectBtn.innerText = originalRejectText;
+                confirmBtn.disabled = !checkbox.checked;
                 rejectBtn.disabled = false;
-                confirmBtn.innerText = "လက်ခံပါသည် (Confirm)";
             }
+        }
+
+        // 7. Event Listeners for Actions
+        confirmBtn.addEventListener('click', function() {
+            if (checkbox.checked) sendTosAction('tos_agree');
         });
 
-        rejectBtn.addEventListener('click', async function() {
-            confirmBtn.disabled = true;
-            rejectBtn.disabled = true;
-            rejectBtn.innerText = "ခဏစောင့်ပါ...";
-
-            const payload = {
-                status: "REJECTED",
-                action: "tos_reject",
-                initData: tg ? tg.initData : "",
-                timestamp: new Date().toISOString()
-            };
-
-            try {
-                await fetch(WORKER_API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-            } catch (err) {}
-
-            if (tg) {
-                try { tg.sendData(JSON.stringify(payload)); } catch (e) {}
-                tg.close();
-            } else {
-                alert('ဝန်ဆောင်မှုကို ပယ်ဖျက်လိုက်ပါသည်။');
-                window.location.href = 'https://www.google.com';
-            }
+        rejectBtn.addEventListener('click', function() {
+            sendTosAction('tos_reject');
         });
     </script>
 </body>
