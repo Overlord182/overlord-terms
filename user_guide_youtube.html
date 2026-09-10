@@ -142,6 +142,11 @@
     </div>
 
     <div class="video-container" id="videoBox">
+        <!-- 
+            YouTube Native Playlist Embed: 
+            list= ရဲ့ အနောက်မှာ မိမိ YouTube Playlist ID အမှန်ကို အစားထိုးပေးရပါမည်။
+            (ဥပမာ - list=PLATyixI4j2D8 နေရာတွင် မိမိ ID ပြောင်းရန်)
+        -->
         <iframe 
             id="ytPlayer"
             src="https://www.youtube.com/embed/videoseries?list=PLATyixI4j2D8&enablejsapi=1" 
@@ -153,7 +158,7 @@
 
     <div class="controls-bar" id="controlsBar">
         <button class="btn-fullscreen" onclick="toggleManualFullscreen()">
-            <span id="btnIcon">⛶</span> <span id="btnText">မျက်နှာပြင် အပြည့်ကြည့်မည် (Zoom)</span>
+            <span id="btnIcon"></span> <span id="btnText">မျက်နှာပြင် အပြည့်ကြည့်မည် (Zoom)</span>
         </button>
     </div>
 
@@ -179,7 +184,7 @@
                 // Open Fullscreen
                 videoBox.classList.add('custom-fullscreen');
                 btnText.textContent = "ပုံမှန်အတိုင်း ပြန်ထားမည်";
-                btnIcon.textContent = "✕";
+                btnIcon.textContent = "";
 
                 // Native API ကူညီနိုင်ပါက ခေါ်မည် (Android အတွက်)
                 if (videoBox.requestFullscreen) {
@@ -189,7 +194,7 @@
                 // Exit Fullscreen
                 videoBox.classList.remove('custom-fullscreen');
                 btnText.textContent = "မျက်နှာပြင် အပြည့်ကြည့်မည် (Zoom)";
-                btnIcon.textContent = "⛶";
+                btnIcon.textContent = "";
 
                 if (document.exitFullscreen && document.fullscreenElement) {
                     document.exitFullscreen().catch(() => {});
@@ -202,7 +207,7 @@
             if (!document.fullscreenElement) {
                 videoBox.classList.remove('custom-fullscreen');
                 btnText.textContent = "မျက်နှာပြင် အပြည့်ကြည့်မည် (Zoom)";
-                btnIcon.textContent = "⛶";
+                btnIcon.textContent = "";
             }
         });
     </script>
