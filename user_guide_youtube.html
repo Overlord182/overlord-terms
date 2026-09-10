@@ -74,29 +74,20 @@
             touch-action: none;
         }
 
-        /* YouTube Title/Share Button ကို နှိပ်၍ Link ယူမရအောင် အပေါ်မှ အုပ်ပေးသည့် Transparent Layer */
-        .yt-click-blocker {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 60px; /* YouTube Header / Title ဧရိယာ */
-            z-index: 20;
-            background: transparent;
-        }
-
-        /* Touch Gestures (Volume, Brightness, Zoom, Seek) အတွက် Overlay */
-        .gesture-overlay {
+        /* Full Interactive Shield Overlay (100% မကွယ်ဘဲ Click / Long Press မှန်သမျှကို ကြားကပိတ်ဆို့ပေးသည်) */
+        .full-shield-overlay {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 15;
+            z-index: 50;
+            background: rgba(0, 0, 0, 0.001); /* iOS Touch ပျောက်မသွားစေရန် */
             touch-action: none;
+            cursor: pointer;
         }
 
-        /* Gestures ပြုလုပ်သည့်အခါ မျက်နှာပြင်အလယ်တွင် စာသားပြပေးသည့် HUD Indicator */
+        /* HUD Indicator */
         .hud-indicator {
             position: absolute;
             top: 50%;
@@ -109,7 +100,7 @@
             font-size: 0.95rem;
             font-weight: bold;
             pointer-events: none;
-            z-index: 25;
+            z-index: 60;
             opacity: 0;
             transition: opacity 0.2s ease;
             display: flex;
@@ -125,11 +116,12 @@
             width: 100%;
             aspect-ratio: 16 / 9; 
             border: none;
+            pointer-events: none; /* iframe ထဲသို့ Direct Interaction/Click စီးဆင်းမသွားစေရန် တားဆီးခြင်း */
             transform-origin: center center;
             transition: filter 0.1s ease, transform 0.05s ease-out;
         }
 
-        /* Pure CSS Fullscreen Mode (iOS / Android နှစ်ခုလုံးအတွက်) */
+        /* Fullscreen Mode Optimization */
         .video-container.custom-fullscreen {
             position: fixed !important;
             top: 0 !important;
@@ -147,7 +139,6 @@
             aspect-ratio: auto !important;
         }
 
-        /* Landscape Mode အတွက် CSS Optimization */
         @media screen and (orientation: landscape) {
             body {
                 padding: 0;
@@ -220,50 +211,46 @@
     </div>
 
     <div class="video-container" id="videoBox">
-        <!-- Click Blocker Layer (YouTube Title နှင့် Share ခလုတ်များကို မနှိပ်နိုင်အောင် အပေါ်မှ ကာကွယ်ပေးသည်) -->
-        <div class="yt-click-blocker"></div>
-        <div class="gesture-overlay" id="gestureOverlay"></div>
+        <!-- Full Overlay Shield (ခလုတ်နှိပ်ခြင်း၊ ဖိထားခြင်း၊ Link ကူးခြင်း လုံးဝ မရအောင် ကာကွယ်ထားသည်) -->
+        <div class="full-shield-overlay" id="gestureOverlay"></div>
         <div class="hud-indicator" id="hudIndicator"></div>
 
-        <!-- Parameters Added: hl=my (Myanmar UI), cc_lang_pref=my (Subtitle Preference), cc_load_policy=1 (Enable CC) -->
+        <!-- Youtube No-Cookie Embed with controls=0, disablekb=1, showinfo=0 -->
         <iframe 
             id="ytPlayer"
-            src="https://www.youtube.com/embed/videoseries?list=PLATyixI4j2D8&enablejsapi=1&rel=0&modestbranding=1&hl=my&cc_lang_pref=my&cc_load_policy=1" 
+            src="https://www.youtube-nocookie.com/embed/videoseries?list=PLATyixI4j2D8&enablejsapi=1&rel=0&controls=0&showinfo=0&iv_load_policy=3&modestbranding=1&disablekb=1&hl=my&cc_lang_pref=my&cc_load_policy=1" 
             title="Overlord Bot Guide" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
             allowfullscreen>
         </iframe>
     </div>
 
     <div class="controls-bar" id="controlsBar">
-        <button class="btn-control" onclick="prevVideo()"> ရှေ့တစ်ပုဒ်</button>
-        <button class="btn-control" onclick="togglePlayPause()"><span id="playStateIcon"></span> သင်္ကေတ</button>
-        <button class="btn-control" onclick="nextVideo()">နောက်တစ်ပုဒ် </button>
+        <button class="btn-control" onclick="prevVideo()">⏮ ရှေ့တစ်ပုဒ်</button>
+        <button class="btn-control" onclick="togglePlayPause()"><span id="playStateIcon">⏯</span> သင်္ကေတ</button>
+        <button class="btn-control" onclick="nextVideo()">နောက်တစ်ပုဒ် ⏭</button>
 
-        <!-- Subtitles Language Selector -->
         <select class="btn-control" id="subtitleSelect" onchange="changeSubtitle(this.value)">
-            <option value="off"> CC: ပိတ်မည်</option>
-            <option value="my"> မြန်မာစာတန်းထိုး</option>
-            <option value="en"> English Subtitle</option>
-            <option value="th">  Subtitle</option>
-            <option value="ja">  Subtitle</option>
-            <option value="ko">  Subtitle</option>
+            <option value="off">💬 CC: ပိတ်မည်</option>
+            <option value="my">💬 မြန်မာစာတန်းထိုး</option>
+            <option value="en">💬 English Subtitle</option>
+            <option value="th">💬 ไทย Subtitle</option>
+            <option value="ja">💬 日本語 Subtitle</option>
+            <option value="ko">💬 한국어 Subtitle</option>
         </select>
 
-        <!-- Browser Voice Text-to-Speech Toggle -->
-        <button class="btn-control" id="ttsBtn" onclick="toggleVoiceOver()"> Voice: Off</button>
+        <button class="btn-control" id="ttsBtn" onclick="toggleVoiceOver()">🔊 Voice: Off</button>
 
-        <!-- Quality Selector -->
         <select class="btn-control" id="qualitySelect" onchange="changeQuality(this.value)">
-            <option value="auto"> Quality: Auto</option>
-            <option value="hd1080"> 1080p (HD)</option>
-            <option value="hd720"> 720p (HD)</option>
-            <option value="large"> 480p</option>
-            <option value="medium"> 360p</option>
+            <option value="auto">⚙️ Quality: Auto</option>
+            <option value="hd1080">⚙️ 1080p (HD)</option>
+            <option value="hd720">⚙️ 720p (HD)</option>
+            <option value="large">⚙️ 480p</option>
+            <option value="medium">⚙️ 360p</option>
         </select>
 
         <button class="btn-control" onclick="toggleManualFullscreen()">
-            <span id="btnIcon"></span> <span id="btnText">မျက်နှာပြင် အပြည့်ကြည့်မည် (Zoom)</span>
+            <span id="btnIcon">⛶</span> <span id="btnText">မျက်နှာပြင် အပြည့်ကြည့်မည် (Zoom)</span>
         </button>
     </div>
 
@@ -286,7 +273,6 @@
         let isPlayerReady = false;
         let isVoiceOverEnabled = false;
 
-        // YouTube Iframe API Init
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('ytPlayer', {
                 events: {
@@ -303,14 +289,9 @@
             });
         }
 
-        // --- Link Protection / Copy Prevention Event Listeners ---
-        // ၁။ Right Click / Long Press Context Menu ပိတ်ခြင်း
+        // Global Link & Context Protection
         document.addEventListener('contextmenu', (e) => e.preventDefault());
-
-        // ၂။ Drag & Drop (ပုံ သို့မဟုတ် iframe ဆွဲယူခြင်း) ပိတ်ခြင်း
         document.addEventListener('dragstart', (e) => e.preventDefault());
-
-        // ၃။ Keyboard Shortcut များ (F12, Ctrl+U, Ctrl+Shift+I, Ctrl+C) ပိတ်ခြင်း
         document.addEventListener('keydown', (e) => {
             if (
                 e.key === 'F12' || 
@@ -321,15 +302,12 @@
             }
         });
 
-        // --- Web Speech API (Text-to-Speech Engine) ---
+        // Speech Engine
         function speakText(text, lang = 'en-US') {
             if (!('speechSynthesis' in window) || !isVoiceOverEnabled) return;
-            window.speechSynthesis.cancel(); // Stop ongoing speech
-
+            window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = lang;
-            utterance.rate = 1.0;
-            utterance.pitch = 1.0;
             window.speechSynthesis.speak(utterance);
         }
 
@@ -337,38 +315,33 @@
             isVoiceOverEnabled = !isVoiceOverEnabled;
             if (isVoiceOverEnabled) {
                 ttsBtn.classList.add('active');
-                ttsBtn.textContent = " Voice: On";
-                showHUD(" Voice Read Aloud: Enabled");
+                ttsBtn.textContent = "🔊 Voice: On";
+                showHUD("🔊 Voice Read Aloud: Enabled");
                 speakText("Voice readout enabled", "en-US");
             } else {
                 ttsBtn.classList.remove('active');
-                ttsBtn.textContent = " Voice: Off";
-                showHUD(" Voice Read Aloud: Disabled");
+                ttsBtn.textContent = "🔊 Voice: Off";
+                showHUD("🔇 Voice Read Aloud: Disabled");
                 window.speechSynthesis.cancel();
             }
         }
 
-        // Subtitles Logic
+        // Subtitles & Quality
         function changeSubtitle(langCode) {
             if (!isPlayerReady) return;
-
             if (langCode === 'off') {
                 player.unloadModule('captions');
                 player.setOption('captions', 'track', {});
-                showHUD(" စာတန်းထိုး: ပိတ်ပါသည်");
+                showHUD("💬 စာတန်းထိုး: ပိတ်ပါသည်");
             } else {
                 player.loadModule('captions');
                 player.setOption('captions', 'track', {'languageCode': langCode});
                 const selectedText = subtitleSelect.options[subtitleSelect.selectedIndex].text;
                 showHUD(`${selectedText}`);
-                
-                if (isVoiceOverEnabled) {
-                    speakText(`Subtitle changed to ${langCode}`, 'en-US');
-                }
+                if (isVoiceOverEnabled) speakText(`Subtitle changed to ${langCode}`, 'en-US');
             }
         }
 
-        // Quality Logic
         function updateQualityMenu() {
             if (!isPlayerReady) return;
             try {
@@ -379,7 +352,7 @@
                     qualities.forEach(q => {
                         const opt = document.createElement('option');
                         opt.value = q;
-                        opt.textContent = ` ${formatQualityName(q)}`;
+                        opt.textContent = `⚙️ ${formatQualityName(q)}`;
                         if (q === currentQual) opt.selected = true;
                         qualitySelect.appendChild(opt);
                     });
@@ -388,29 +361,20 @@
         }
 
         function formatQualityName(q) {
-            const names = {
-                'highres': '4K / 2K',
-                'hd1080': '1080p (HD)',
-                'hd720': '720p (HD)',
-                'large': '480p',
-                'medium': '360p',
-                'small': '240p',
-                'tiny': '144p',
-                'auto': 'Auto'
-            };
+            const names = {'highres': '4K / 2K', 'hd1080': '1080p (HD)', 'hd720': '720p (HD)', 'large': '480p', 'medium': '360p', 'small': '240p', 'tiny': '144p', 'auto': 'Auto'};
             return names[q] || q;
         }
 
         function changeQuality(val) {
             if (!isPlayerReady) return;
             player.setPlaybackQuality(val);
-            showHUD(` Quality: ${formatQualityName(val)}`);
+            showHUD(`⚙️ Quality: ${formatQualityName(val)}`);
         }
 
-        // Touch Gestures State
+        // Gesture Logic
         let touchStartX = 0, touchStartY = 0;
         let currentBrightness = 1.0, currentVolume = 100, currentZoom = 1.0;
-        let initialPinchDist = 0, lastTapTime = 0;
+        let initialPinchDist = 0, lastTapTime = 0, tapTimeout;
         let isSeekingGesture = false, isVolumeGesture = false, isBrightnessGesture = false;
         let seekDeltaTime = 0, hudTimeout;
 
@@ -434,8 +398,17 @@
                 isSeekingGesture = isVolumeGesture = isBrightnessGesture = false;
 
                 const currentTime = new Date().getTime();
-                if (currentTime - lastTapTime < 300) {
+                const tapLength = currentTime - lastTapTime;
+
+                if (tapLength < 300 && tapLength > 0) {
+                    clearTimeout(tapTimeout);
                     handleDoubleTap(touchStartX);
+                } else {
+                    tapTimeout = setTimeout(() => {
+                        if (!isSeekingGesture && !isVolumeGesture && !isBrightnessGesture) {
+                            togglePlayPause();
+                        }
+                    }, 300);
                 }
                 lastTapTime = currentTime;
             }
@@ -447,7 +420,7 @@
                 if (initialPinchDist > 0) {
                     currentZoom = Math.min(Math.max(1.0, currentZoom * (newDist / initialPinchDist)), 3.0);
                     ytIframe.style.transform = `scale(${currentZoom})`;
-                    showHUD(` Zoom: ${currentZoom.toFixed(1)}x`);
+                    showHUD(`🔍 Zoom: ${currentZoom.toFixed(1)}x`);
                     initialPinchDist = newDist;
                 }
             } else if (e.touches.length === 1) {
@@ -458,7 +431,9 @@
                 if (!isSeekingGesture && !isVolumeGesture && !isBrightnessGesture) {
                     if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 15) {
                         isSeekingGesture = true;
+                        clearTimeout(tapTimeout);
                     } else if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 15) {
+                        clearTimeout(tapTimeout);
                         if (touchStartX < rect.width / 2) isBrightnessGesture = true;
                         else isVolumeGesture = true;
                     }
@@ -467,20 +442,20 @@
                 if (isBrightnessGesture) {
                     currentBrightness = Math.min(Math.max(0.2, currentBrightness - diffY * 0.003), 1.5);
                     ytIframe.style.filter = `brightness(${currentBrightness})`;
-                    showHUD(` Brightness: ${Math.round((currentBrightness / 1.5) * 100)}%`);
+                    showHUD(`☀️ Brightness: ${Math.round((currentBrightness / 1.5) * 100)}%`);
                     touchStartY = e.touches[0].clientY;
                 }
 
                 if (isVolumeGesture && isPlayerReady) {
                     currentVolume = Math.min(Math.max(0, currentVolume - diffY * 0.2), 100);
                     player.setVolume(currentVolume);
-                    showHUD(` Volume: ${Math.round(currentVolume)}%`);
+                    showHUD(`🔊 Volume: ${Math.round(currentVolume)}%`);
                     touchStartY = e.touches[0].clientY;
                 }
 
                 if (isSeekingGesture) {
                     seekDeltaTime = Math.round(diffX * 0.15);
-                    showHUD(`${seekDeltaTime > 0 ? " +" : " "}${seekDeltaTime}s`);
+                    showHUD(`${seekDeltaTime > 0 ? "⏩ +" : "⏪ "}${seekDeltaTime}s`);
                 }
             }
         }, { passive: true });
@@ -498,12 +473,12 @@
             const rect = gestureOverlay.getBoundingClientRect();
             const currentTime = player.getCurrentTime();
 
-            if (xPos < rect.width * 0.35) {
+            if (xPos < rect.width * 0.4) {
                 player.seekTo(currentTime - 10, true);
-                showHUD(" -10 Seconds");
-            } else if (xPos > rect.width * 0.65) {
+                showHUD("⏪ -10 Seconds");
+            } else if (xPos > rect.width * 0.6) {
                 player.seekTo(currentTime + 10, true);
-                showHUD(" +10 Seconds");
+                showHUD("⏩ +10 Seconds");
             } else {
                 togglePlayPause();
             }
@@ -513,51 +488,41 @@
             if (!isPlayerReady) return;
             if (player.getPlayerState() === YT.PlayerState.PLAYING) {
                 player.pauseVideo();
-                showHUD(" Paused");
+                showHUD("⏸ Paused");
             } else {
                 player.playVideo();
-                showHUD(" Playing");
+                showHUD("▶ Playing");
             }
         }
 
         function nextVideo() {
             if (isPlayerReady && player.nextVideo) {
                 player.nextVideo();
-                showHUD(" နောက်တစ်ပုဒ်");
+                showHUD("⏭ နောက်တစ်ပုဒ်");
             }
         }
 
         function prevVideo() {
             if (isPlayerReady && player.previousVideo) {
                 player.previousVideo();
-                showHUD(" ရှေ့တစ်ပုဒ်");
+                showHUD("⏮ ရှေ့တစ်ပုဒ်");
             }
         }
 
-        // Toggle Fullscreen System
         function toggleManualFullscreen() {
-            if (tg.HapticFeedback) {
-                tg.HapticFeedback.impactOccurred('medium');
-            }
-
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
             const isFullscreen = videoBox.classList.contains('custom-fullscreen');
 
             if (!isFullscreen) {
                 videoBox.classList.add('custom-fullscreen');
                 btnText.textContent = "ပုံမှန်အတိုင်း ပြန်ထားမည်";
-                btnIcon.textContent = "";
-
-                if (videoBox.requestFullscreen) {
-                    videoBox.requestFullscreen().catch(() => {});
-                }
+                btnIcon.textContent = "✕";
+                if (videoBox.requestFullscreen) videoBox.requestFullscreen().catch(() => {});
             } else {
                 videoBox.classList.remove('custom-fullscreen');
                 btnText.textContent = "မျက်နှာပြင် အပြည့်ကြည့်မည် (Zoom)";
-                btnIcon.textContent = "";
-
-                if (document.exitFullscreen && document.fullscreenElement) {
-                    document.exitFullscreen().catch(() => {});
-                }
+                btnIcon.textContent = "⛶";
+                if (document.exitFullscreen && document.fullscreenElement) document.exitFullscreen().catch(() => {});
             }
         }
 
@@ -565,7 +530,7 @@
             if (!document.fullscreenElement) {
                 videoBox.classList.remove('custom-fullscreen');
                 btnText.textContent = "မျက်နှာပြင် အပြည့်ကြည့်မည် (Zoom)";
-                btnIcon.textContent = "";
+                btnIcon.textContent = "⛶";
             }
         });
     </script>
