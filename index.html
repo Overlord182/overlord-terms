@@ -15,17 +15,20 @@
 
     <style>
         :root {
-            /* Telegram Theme Variables with Default Fallbacks */
+            /* Telegram Theme Variables */
             --bg-color: var(--tg-theme-secondary-bg-color, #f8fafc);
             --card-bg: var(--tg-theme-bg-color, #ffffff);
             --text-primary: var(--tg-theme-text-color, #0f172a);
             --text-secondary: var(--tg-theme-hint-color, #475569);
-            --brand-color: #1e3a8a;
+            
+            /* Dark/Light Dynamic Color Fix */
+            --brand-color: var(--tg-theme-text-color, #1e3a8a);
             --accent-color: var(--tg-theme-button-color, #2563eb);
-            --border-color: #e2e8f0;
+            --border-color: var(--tg-theme-secondary-bg-color, #e2e8f0);
+            --section-bg: var(--tg-theme-secondary-bg-color, #eff6ff);
+            --tos-bg: var(--tg-theme-bg-color, #f8fafc);
             --success-color: #16a34a;
             --danger-color: #dc2626;
-            --tos-bg: var(--tg-theme-secondary-bg-color, #f8fafc);
         }
 
         body { 
@@ -59,7 +62,7 @@
             align-items: center;
             gap: 6px;
             background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
-            color: var(--brand-color);
+            color: #1e3a8a;
             font-size: 11px;
             font-weight: 700;
             padding: 5px 14px;
@@ -124,7 +127,7 @@
         }
 
         .section-title {
-            background: linear-gradient(90deg, #eff6ff 0%, var(--card-bg) 100%);
+            background: linear-gradient(90deg, var(--section-bg) 0%, var(--card-bg) 100%);
             color: var(--brand-color);
             padding: 8px 14px;
             border-left: 4px solid var(--accent-color);
@@ -364,7 +367,7 @@
                     </li>
                     <li>
                         <b>နိုင်ငံတကာ ငွေကြေး ဈေးကွက် (Forex Market Risk):</b><br>
-                        High Leverage အသုံးပြုမှုကြောင့် လျှင်မြန်စွာ အရင်းပြောင် ဆုံးရှုံးနိုင်ခြင်း၊ စနေ/တနင်္ဂနွေ ဈေးကွက်ပိတ်ချိန်များအပြီး Price Gap များကြောင့် Stop-Loss မထိဘဲ အရှုံးကြီးမားနိုင်သည့် စွန့်စားရမှုများ ရှိသည်။
+                        High Leverage အသုံးပြုမှုကြောင့် လျှင်မြန်စွာ အရင်းပြောင် ဆုံးရှုံးနိုင်ခြင်း၊ စနေ/တနွေနေ့ ဈေးကွက်ပိတ်ချိန်များအပြီး Price Gap များကြောင့် Stop-Loss မထိဘဲ အရှုံးကြီးမားနိုင်သည့် စွန့်စားရမှုများ ရှိသည်။
                         <i>(Risks include rapid capital depletion due to high leverage, and massive losses without triggering Stop-Loss due to price gaps after weekend market closures.)</i>
                     </li>
                     <li>
@@ -557,9 +560,11 @@
             tg.expand();
         }
 
-        // 2. Query Parameters Fallback
+        // 2. Query Parameters & Telegram Native Fallback
         const urlParams = new URLSearchParams(window.location.search);
         const userIdFromUrl = urlParams.get('user_id');
+        const tgUserId = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) ? tg.initDataUnsafe.user.id : '';
+        const finalUserId = userIdFromUrl || tgUserId;
 
         // DOM Elements
         const tosContent = document.getElementById('tosContent');
@@ -594,13 +599,22 @@
 
         // 3. Scroll Event Listener
         tosContent.addEventListener('scroll', function() {
-            const isBottom = Math.ceil(tosContent.scrollTop + tosContent.clientHeight) >= tosContent.scrollHeight - 35;
-            if (isBottom) unlockCheckbox();
+            const threshold = 25;
+            const isAtBottom = Math.ceil(tosContent.scrollTop + tosContent.clientHeight) >= (tosContent.scrollHeight - threshold);
+            
+            if (isAtBottom) {
+                unlockCheckbox();
+            }
         });
 
-        // Trigger Scroll Check on Page Load
         window.addEventListener('load', checkInitialScrollState);
         window.addEventListener('resize', checkInitialScrollState);
+        if (document.fonts) {
+            document.fonts.ready.then(checkInitialScrollState);
+        }
+        if (tg) {
+            tg.onEvent('viewportChanged', checkInitialScrollState);
+        }
 
         // 4. Checkbox State Change
         checkbox.addEventListener('change', function() {
@@ -612,17 +626,14 @@
         // 5. Print/PDF Download Trigger
         downloadPdfBtn.addEventListener('click', () => window.print());
 
-        // 6. API Interaction Handler (With Loading States)
+        // 6. API Interaction Handler
         async function sendTosAction(actionType) {
-            
-            // 👈 (အသစ်ထည့်ထားသည်) နှိပ်လိုက်တာနဲ့ ဖုန်းလေးတုန်သွားအောင် Haptic Feedback ပေးခြင်း
             if (tg && tg.HapticFeedback) {
                 tg.HapticFeedback.impactOccurred('medium');
             }
 
             const initData = tg ? tg.initData : '';
             
-            // Disable buttons & show loading feedback
             confirmBtn.disabled = true;
             rejectBtn.disabled = true;
             
@@ -637,15 +648,14 @@
 
             const payload = {
                 initData: initData,
-                user_id: userIdFromUrl,
+                user_id: finalUserId,
                 action: actionType
             };
 
             try {
-                // 👈 (ပြင်ဆင်ထားသည်) ဒီနေရာမှာ အစ်ကို့ရဲ့ တကယ့် Cloudflare Worker URL ကို အစားထိုးထည့်ပေးပါ
+                // Cloudflare Worker API Endpoint
                 const apiUrl = 'https://your-worker-name.your-username.workers.dev/api/tos-agree';
 
-                // Cloudflare Worker API Endpoint သို့ ပို့ခြင်း
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -655,8 +665,6 @@
                 const result = await response.json();
 
                 if (response.ok && result.success) {
-                    
-                    // 👈 (အသစ်ထည့်ထားသည်) လုပ်ဆောင်မှု အောင်မြင်ကြောင်း တုန်ခါမှုပေးခြင်း
                     if (tg && tg.HapticFeedback) {
                         tg.HapticFeedback.notificationOccurred('success'); 
                     }
@@ -669,10 +677,9 @@
                         tg.showAlert(message, () => tg.close());
                     } else {
                         alert(message);
+                        document.body.innerHTML = `<div style="text-align:center; padding:50px; font-family: 'Noto Sans Myanmar', sans-serif;"><h2>${message}</h2><p>ဤ Page ကို ပိတ်လိုက်လို့ရပါပြီ။</p></div>`;
                     }
                 } else {
-                    
-                    // 👈 (အသစ်ထည့်ထားသည်) Error တက်ကြောင်း တုန်ခါမှုပေးခြင်း (Optional)
                     if (tg && tg.HapticFeedback) {
                         tg.HapticFeedback.notificationOccurred('error'); 
                     }
@@ -680,15 +687,12 @@
                     const errorMsg = result.error || "လုပ်ဆောင်မှု မအောင်မြင်ပါ။";
                     tg ? tg.showAlert("⚠️ Error: " + errorMsg) : alert("⚠️ Error: " + errorMsg);
                     
-                    // Reset UI
                     confirmBtn.innerText = originalConfirmText;
                     rejectBtn.innerText = originalRejectText;
                     confirmBtn.disabled = !checkbox.checked;
                     rejectBtn.disabled = false;
                 }
             } catch (err) {
-                
-                // 👈 (အသစ်ထည့်ထားသည်) Network Error တက်ကြောင်း တုန်ခါမှုပေးခြင်း (Optional)
                 if (tg && tg.HapticFeedback) {
                     tg.HapticFeedback.notificationOccurred('error'); 
                 }
@@ -696,7 +700,6 @@
                 const netErr = "Network Error: " + err.message;
                 tg ? tg.showAlert("⚠️ " + netErr) : alert("⚠️ " + netErr);
                 
-                // Reset UI
                 confirmBtn.innerText = originalConfirmText;
                 rejectBtn.innerText = originalRejectText;
                 confirmBtn.disabled = !checkbox.checked;
