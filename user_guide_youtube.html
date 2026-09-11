@@ -427,9 +427,10 @@
         tg.ready();
         tg.expand();
 
-        // မိမိ၏ YouTube Channel ID ကို ထည့်ပါ (RSS Feed သုံးထားသဖြင့် API Key လုံးဝ မလိုပါ)
+        // API Key မလိုဘဲ သုံးနိုင်သော Config များ (မိမိ၏ ID အမှန်များကို ထည့်သွင်းပါ)
         const YOUTUBE_API_KEY = ""; 
-        const CHANNEL_ID = "UCSyM27DAnWU9Yd60eqCPufg"; // ဥပမာ - UCxxxxxxxxxxxxxxxxxxxxxx
+        const PLAYLIST_ID = "PLATyixI4j2D8"; // မိမိ၏ YouTube Playlist ID အမှန်ကို ဒီနေရာတွင် ပြင်ဆင်နိုင်ပါသည်
+        const CHANNEL_ID = "UCSyM27DAnWU9Yd60eqCPufg"; // သို့မဟုတ် Channel ID
 
         const videoBox = document.getElementById('videoBox');
         const ytIframe = document.getElementById('ytPlayer');
@@ -446,7 +447,7 @@
         const timeDisplay = document.getElementById('timeDisplay');
         const searchInput = document.getElementById('searchInput');
 
-        // Playlist Data Queue (Channel ID မရှိသေးချိန်တွင် မူရင်း Fallback အနေဖြင့် သုံးပါမည်)
+        // Fallback Playlist Data
         let playlistData = [
             { id: "M7lc1UVf-VE", title: "၁။ Overlord Bot အခြေခံ အသုံးပြုနည်း", duration: "05:20" },
             { id: "L_LUpnjgPso", title: "၂။ Signal များဖတ်ပြီး Trade ဝင်နည်း", duration: "08:15" },
@@ -459,32 +460,43 @@
         let currentVideoIndex = 0;
         let isSeeking = false;
 
-        // နည်းလမ်း (၁) - Channel မှ ဗီဒီယိုများကို RSS Feed သုံး၍ API Key မလိုဘဲ တိုက်ရိုက် ဆွဲယူပေးသည့် Function
-        async function fetchChannelVideos() {
-            if (!CHANNEL_ID) return;
+        // RSS Feed မူဘောင်မှတစ်ဆင့် Playlist (သို့) Channel ဗီဒီယိုများကို API Key မလိုဘဲ တိုက်ရိုက်ဆွဲယူခြင်း
+        async function fetchVideosFromRSS() {
+            let rssUrl = "";
+            if (PLAYLIST_ID && PLAYLIST_ID.length > 5) {
+                rssUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${PLAYLIST_ID}`;
+            } else if (CHANNEL_ID) {
+                rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL_ID}`;
+            }
+
+            if (!rssUrl) return;
 
             try {
-                // RSS Feed ကို JSON ပြောင်းပေးသည့် Free API သုံးခြင်း (API Key လုံးဝမလိုပါ)
-                const rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL_ID}`;
                 const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
-                
                 const response = await fetch(apiUrl);
                 const data = await response.json();
 
                 if (data.items && data.items.length > 0) {
                     playlistData = data.items.map((item, idx) => {
-                        // Video ID သီးသန့် ခွဲထုတ်ခြင်း
-                        const videoId = item.link.split('v=')[1];
+                        let videoId = "";
+                        if (item.link.includes('v=')) {
+                            videoId = item.link.split('v=')[1].split('&')[0];
+                        } else {
+                            videoId = item.guid.replace('yt:video:', '');
+                        }
+
                         return {
                             id: videoId,
                             title: `${idx + 1}။ ${item.title}`,
-                            duration: new Date(item.pubDate).toLocaleDateString()
+                            duration: item.pubDate ? new Date(item.pubDate).toLocaleDateString() : "Video"
                         };
-                    });
+                    }).filter(v => v.id);
 
-                    // UI တွင် စာရင်း ဖော်ပြပြီး ပထမဆုံး ဗီဒီယိုကို စတင်ဖွင့်ခြင်း
                     renderPlaylist();
-                    if (isPlayerReady) {
+
+                    // Saved State မရှိပါက ပထမဆုံး Video ကို စတင်ဖွင့်ပေးခြင်း
+                    const savedVideoId = localStorage.getItem('last_yt_id');
+                    if (isPlayerReady && !savedVideoId && playlistData.length > 0) {
                         playVideoAtIndex(0);
                     }
                 }
@@ -511,10 +523,8 @@
                             player.loadVideoById(savedVideoId, parseFloat(savedTime) || 0);
                         }
 
-                        // Channel ID ထည့်သွင်းထားပါက RSS Feed မှတစ်ဆင့် တိုက်ရိုက် ဆွဲယူမည်
-                        if (CHANNEL_ID) {
-                            fetchChannelVideos();
-                        }
+                        // RSS Feed မှတစ်ဆင့် Playlist / Channel Videos များကို လှမ်းယူမည်
+                        fetchVideosFromRSS();
 
                         startProgressLoop();
                     },
