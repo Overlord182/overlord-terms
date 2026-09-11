@@ -65,7 +65,7 @@
             line-height: 1.4;
         }
 
-        /* Video Container & Gestures */
+        /* Video Container & Touch Gestures UI */
         .video-container {
             position: relative;
             display: flex;
@@ -136,7 +136,7 @@
             left: 0;
             right: 0;
             z-index: 55;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
             padding: 8px 12px 6px 12px;
             display: flex;
             align-items: center;
@@ -169,7 +169,7 @@
             margin: 0;
         }
 
-        /* Fullscreen Mode Optimization */
+        /* Custom Fullscreen Mode */
         .video-container.custom-fullscreen {
             position: fixed !important;
             top: 0 !important;
@@ -381,7 +381,7 @@
     <!-- Control Buttons Panel -->
     <div class="controls-bar" id="controlsBar">
         <button class="btn-control" onclick="prevVideo()">⏮ ရှေ့တစ်ပုဒ်</button>
-        <button class="btn-control" onclick="togglePlayPause()"><span id="playStateIcon">▶</span> သင်္ကေတ</button>
+        <button class="btn-control" onclick="togglePlayPause()"><span id="playStateIcon">▶</span> Play/Pause</button>
         <button class="btn-control" onclick="nextVideo()">နောက်တစ်ပုဒ် ⏭</button>
 
         <select class="btn-control" id="subtitleSelect" onchange="changeSubtitle(this.value)">
@@ -416,7 +416,7 @@
         <button class="btn-control" onclick="performSearch()">🔍 ရှာမည်</button>
     </div>
 
-    <!-- Continuous Playlist Queue Section -->
+    <!-- Playlist Queue Section -->
     <div class="playlist-section">
         <div class="playlist-title" id="playlistTitleHeader">📚 လမ်းညွှန် ဗီဒီယိုများ စာရင်း</div>
         <div class="video-list" id="videoListContainer"></div>
@@ -427,10 +427,10 @@
         tg.ready();
         tg.expand();
 
-        // API Key မလိုဘဲ သုံးနိုင်သော Config များ (မိမိ၏ ID အမှန်များကို ထည့်သွင်းပါ)
+        // Config များ (လိုအပ်ပါက YouTube API Key ထည့်သွင်းနိုင်ပါသည်)
         const YOUTUBE_API_KEY = ""; 
-        const PLAYLIST_ID = "PLATyixI4j2D8"; // မိမိ၏ YouTube Playlist ID အမှန်ကို ဒီနေရာတွင် ပြင်ဆင်နိုင်ပါသည်
-        const CHANNEL_ID = "UCSyM27DAnWU9Yd60eqCPufg"; // သို့မဟုတ် Channel ID
+        const PLAYLIST_ID = "PLATyixI4j2D8"; 
+        const CHANNEL_ID = "UCSyM27DAnWU9Yd60eqCPufg"; 
 
         const videoBox = document.getElementById('videoBox');
         const ytIframe = document.getElementById('ytPlayer');
@@ -447,7 +447,7 @@
         const timeDisplay = document.getElementById('timeDisplay');
         const searchInput = document.getElementById('searchInput');
 
-        // Fallback Playlist Data
+        // Initial Playlist Data
         let playlistData = [
             { id: "M7lc1UVf-VE", title: "၁။ Overlord Bot အခြေခံ အသုံးပြုနည်း", duration: "05:20" },
             { id: "L_LUpnjgPso", title: "၂။ Signal များဖတ်ပြီး Trade ဝင်နည်း", duration: "08:15" },
@@ -460,7 +460,7 @@
         let currentVideoIndex = 0;
         let isSeeking = false;
 
-        // RSS Feed မူဘောင်မှတစ်ဆင့် Playlist (သို့) Channel ဗီဒီယိုများကို API Key မလိုဘဲ တိုက်ရိုက်ဆွဲယူခြင်း
+        // API Key မလိုဘဲ RSS Feed မှတစ်ဆင့် Playlist/Channel ဗီဒီယိုများ ဆွဲယူခြင်း
         async function fetchVideosFromRSS() {
             let rssUrl = "";
             if (PLAYLIST_ID && PLAYLIST_ID.length > 5) {
@@ -494,7 +494,6 @@
 
                     renderPlaylist();
 
-                    // Saved State မရှိပါက ပထမဆုံး Video ကို စတင်ဖွင့်ပေးခြင်း
                     const savedVideoId = localStorage.getItem('last_yt_id');
                     if (isPlayerReady && !savedVideoId && playlistData.length > 0) {
                         playVideoAtIndex(0);
@@ -523,9 +522,7 @@
                             player.loadVideoById(savedVideoId, parseFloat(savedTime) || 0);
                         }
 
-                        // RSS Feed မှတစ်ဆင့် Playlist / Channel Videos များကို လှမ်းယူမည်
                         fetchVideosFromRSS();
-
                         startProgressLoop();
                     },
                     'onStateChange': (event) => {
@@ -536,7 +533,6 @@
                             playStateIcon.textContent = '▶';
                         }
 
-                        // Auto Play Next Video on End
                         if (event.data === YT.PlayerState.ENDED) {
                             nextVideo();
                         }
@@ -545,7 +541,7 @@
             });
         }
 
-        // Global Link & Context Protection (Excluding Input Bar)
+        // Link Protection & Context Prevention
         document.addEventListener('contextmenu', (e) => {
             if (e.target.tagName !== 'INPUT') e.preventDefault();
         });
@@ -560,7 +556,7 @@
             }
         });
 
-        // Search Logic (Direct Link or YouTube Search API)
+        // Search & Direct Link Logic
         function extractVideoId(url) {
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
             const match = url.match(regExp);
@@ -573,7 +569,6 @@
 
             const extractedId = extractVideoId(query);
             if (extractedId) {
-                // Direct YouTube Link / ID pasted
                 const newVid = { id: extractedId, title: "ထည့်သွင်းထားသော ဗီဒီယို (" + extractedId + ")", duration: "Custom Link" };
                 playlistData.unshift(newVid);
                 currentVideoIndex = 0;
@@ -584,10 +579,9 @@
                 return;
             }
 
-            // Keyword Search via YouTube Data API
             if (!YOUTUBE_API_KEY) {
                 showHUD("⚠️ API Key လိုအပ်ပါသည်");
-                alert("စာရိုက်၍ ရှာဖွေရန် Code ထဲရှိ YOUTUBE_API_KEY တွင် Key ထည့်ပေးပါ။ သို့မဟုတ် YouTube Video Link / ID ကို Paste လုပ်၍ ရှာနိုင်ပါသည်။");
+                alert("စာရိုက်၍ ရှာဖွေရန် YOUTUBE_API_KEY တွင် Key ထည့်ပေးပါ။ သို့မဟုတ် YouTube Video Link / ID ကို Paste လုပ်၍ ရှာနိုင်ပါသည်။");
                 return;
             }
 
@@ -615,7 +609,7 @@
             }
         }
 
-        // Playlist Queue Functions
+        // Playlist Functions
         function renderPlaylist() {
             const container = document.getElementById('videoListContainer');
             container.innerHTML = '';
@@ -663,7 +657,7 @@
             showHUD("⏮ ရှေ့တစ်ပုဒ်");
         }
 
-        // Timeline Progress Bar Scrubber
+        // Progress Scrubber Bar Loop
         seekInput.addEventListener('input', (e) => {
             isSeeking = true;
             progressFill.style.width = e.target.value + '%';
@@ -689,7 +683,6 @@
                         seekInput.value = pct;
                         timeDisplay.textContent = `${formatTime(current)} / ${formatTime(duration)}`;
                         
-                        // Storage Resume Feature
                         if (playlistData[currentVideoIndex]) {
                             localStorage.setItem('last_yt_id', playlistData[currentVideoIndex].id);
                             localStorage.setItem('last_yt_time', current);
@@ -730,7 +723,7 @@
             }
         }
 
-        // Subtitles & Quality
+        // Subtitles & Quality Control
         function changeSubtitle(langCode) {
             if (!isPlayerReady) return;
             if (langCode === 'off') {
