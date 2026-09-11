@@ -3,9 +3,8 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main  # မိမိ main branch နာမည်ဖြစ်ရမည်
+      - main
 
-# Bot ကို Write Permission သီးသန့် ပေးခြင်း
 permissions:
   contents: write
 
@@ -14,12 +13,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4  # v4 သို့ မြှင့်ထားပါသည်
+        uses: actions/checkout@v4
 
+      # HTML ဖိုင်အားလုံး (*.html) ထဲတွင် Key များကို အစားထိုးခိုင်းခြင်း
       - name: Inject Secrets into Code
         run: |
-          sed -i 's/__YOUTUBE_API_KEY__/${{ secrets.YOUTUBE_API_KEY }}/g' index.html
-          sed -i 's/__GEMINI_API_KEY__/${{ secrets.GEMINI_API_KEY }}/g' index.html
+          sed -i 's/__YOUTUBE_API_KEY__/${{ secrets.YOUTUBE_API_KEY }}/g' *.html
+          sed -i 's/__GEMINI_API_KEY__/${{ secrets.GEMINI_API_KEY }}/g' *.html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
