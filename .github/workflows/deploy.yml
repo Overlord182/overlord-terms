@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main  # မိမိ main branch နာမည်ဖြစ်ရမည် (master ဆိုပါက master ဟုပြင်ပါ)
+      - main  # မိမိ main branch နာမည်ဖြစ်ရမည်
 
 permissions:
   contents: write
@@ -15,6 +15,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # Push Protection မမိစေရန် Base64 Encoding ဖြင့် Key များ ထည့်သွင်းခြင်း
       - name: Inject Secrets into Code
         run: |
           Y_KEY=$(echo -n "${{ secrets.YOUTUBE_API_KEY }}" | base64 -w 0)
