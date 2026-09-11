@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overlord System - Master Terms of Service</title>
+    
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <!-- Google Fonts: Noto Sans Myanmar & Padauk -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Myanmar:wght@400;600;700&family=Padauk:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Telegram Theme Variables */
+            --bg-color: var(--tg-theme-secondary-bg-color, #f8fafc);
+            --card-bg: var(--tg-theme-bg-color, #ffffff);
+            --text-primary: var(--tg-theme-text-color, #0f172a);
+            --text-secondary: var(--tg-theme-hint-color, #475569);
+            
+            /* Dark/Light Dynamic Color Fix */
+            --brand-color: var(--tg-theme-text-color, #1e3a8a);
+            --accent-color: var(--tg-theme-button-color, #2563eb);
+            --border-color: var(--tg-theme-secondary-bg-color, #e2e8f0);
+            --section-bg: var(--tg-theme-secondary-bg-color, #eff6ff);
+            --tos-bg: var(--tg-theme-bg-color, #f8fafc);
+            --success-color: #16a34a;
+            --danger-color: #dc2626;
+        }
+
+        body { 
+            font-family: 'Noto Sans Myanmar', 'Padauk', 'Pyidaungsu', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.8; 
+            color: var(--text-primary); 
+            max-width: 880px; 
+            margin: 0 auto; 
+            padding: 20px 15px; 
+            background-color: var(--bg-color);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container { 
+            background-color: var(--card-bg); 
+            padding: 30px; 
+            border-radius: 20px; 
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+            border: 1px solid var(--border-color);
+        }
+
+        .header-box {
+            text-align: center;
+            border-bottom: 2px dashed var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 24px;
+        }
+
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+            color: #1e3a8a;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 5px 14px;
+            border-radius: 50px;
+            border: 1px solid #bfdbfe;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        h1 { 
+            color: var(--brand-color); 
+            font-size: 24px;
+            margin: 6px 0;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .meta-text {
+            font-size: 12.5px;
+            color: var(--text-secondary);
+        }
+
+        .tos-content {
+            background: var(--tos-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 24px;
+            max-height: 50vh;
+            overflow-y: auto;
+            font-size: 13.5px;
+            color: var(--text-primary);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
+            scroll-behavior: smooth;
+        }
+
+        .tos-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        .tos-content::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+        .tos-content::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 8px;
+        }
+
+        .tos-content b {
+            color: var(--brand-color);
+            font-weight: 700;
+        }
+
+        .tos-content i {
+            color: var(--text-secondary);
+            font-style: normal;
+            opacity: 0.85;
+            display: block;
+            margin-top: 2px;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        .section-title {
+            background: linear-gradient(90deg, var(--section-bg) 0%, var(--card-bg) 100%);
+            color: var(--brand-color);
+            padding: 8px 14px;
+            border-left: 4px solid var(--accent-color);
+            border-radius: 6px;
+            font-weight: 700;
+            margin-top: 22px;
+            margin-bottom: 12px;
+            font-size: 14.5px;
+        }
+
+        .sub-section-title {
+            color: var(--brand-color);
+            font-weight: 700;
+            font-size: 13.5px;
+            margin-top: 14px;
+            margin-bottom: 6px;
+        }
+
+        ul, ol {
+            margin: 0;
+            padding-left: 22px;
+        }
+
+        li {
+            margin-bottom: 12px;
+        }
+
+        code {
+            background: #e2e8f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #0f172a;
+        }
+
+        .scroll-hint {
+            text-align: center;
+            font-size: 12.5px;
+            color: #d97706;
+            margin-top: 14px;
+            font-weight: 600;
+            background: #fffbeb;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px dashed #fde68a;
+            transition: all 0.3s ease;
+        }
+
+        .pdf-btn-wrapper {
+            text-align: center;
+            margin: 22px 0;
+        }
+
+        .pdf-btn {
+            padding: 13px 30px; 
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            color: #ffffff; 
+            border: none;
+            border-radius: 10px; 
+            font-weight: 700; 
+            font-size: 14px; 
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.28);
+            transition: all 0.2s ease;
+        }
+
+        .pdf-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(37, 99, 235, 0.38);
+        }
+
+        .action-box {
+            background: var(--card-bg);
+            border-radius: 14px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+        }
+
+        .checkbox-label {
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 13.5px;
+            text-align: left;
+            user-select: none;
+        }
+
+        .checkbox-label.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+        }
+
+        .btn-confirm {
+            flex: 1;
+            padding: 13px 20px;
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: not-allowed;
+            opacity: 0.5;
+            font-weight: 700;
+            font-size: 14px;
+            transition: 0.2s ease;
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);
+        }
+
+        .btn-reject {
+            flex: 1;
+            padding: 13px 20px;
+            background: #fef2f2;
+            color: var(--danger-color);
+            border: 1px solid #fecaca;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            transition: 0.2s ease;
+        }
+
+        @media print {
+            body {
+                background-color: #ffffff !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                font-family: 'Noto Sans Myanmar', 'Padauk', sans-serif !important;
+            }
+
+            .container {
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            .tos-content {
+                max-height: none !important;
+                overflow: visible !important;
+                border: none !important;
+                background: transparent !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                font-size: 11pt !important;
+                line-height: 2.0 !important;
+            }
+
+            .scroll-hint, .pdf-btn-wrapper, .action-box {
+                display: none !important;
+            }
+
+            .section-title, .sub-section-title, p, li {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+
+            .section-title {
+                border-left: 4px solid #1e3a8a !important;
+                background: #f1f5f9 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="tosSection">
+            
+            <div class="header-box">
+                <span class="header-badge">
+                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M2.166 4.999A2.386 2.386 0 014.553 2.61h10.894a2.386 2.386 0 012.387 2.389v10.002a2.386 2.386 0 01-2.387 2.389H4.553a2.386 2.386 0 01-2.387-2.389V4.999zM4.553 4.11a.886.886 0 00-.887.889v10.002c0 .491.397.889.887.889h10.894c.49 0 .887-.398.887-.889V4.999a.886.886 0 00-.887-.889H4.553z" clip-rule="evenodd"/></svg>
+                    Official Master Terms
+                </span>
+                <h1>Overlord System - Terms of Service</h1>
+                <p class="meta-text">Master User Agreement & Legal Privacy Policy | <em>Updated: August 2026</em></p>
+            </div>
+
+            <!-- Scrollable TOS Content Panel -->
+            <div class="tos-content" id="tosContent">
+                
+                <p><b>🔒 Overlord System - Master Terms of Service, User Agreement & Privacy Policy</b></p>
+                <p>Overlord စနစ်ကို မစတင်မီ အောက်ပါ ဥပဒေရေးရာ စည်းမျဉ်းများ၊ အန္တရာယ် သတိပေးချက်များနှင့် ကိုယ်ရေးကိုယ်တာ အချက်အလက် မူဝါဒများကို မဖြစ်မနေ အသေးစိတ် ဖတ်ရှုပြီး သဘောတူညီရန် လိုအပ်ပါသည်။</p>
+                <i>(Before starting the Overlord system, you must read in detail and agree to the following legal terms, risk warnings, and privacy policies.)</i>
+
+                <div class="section-title">၁။ လုပ်ငန်းသဘာဝနှင့် ဝန်ဆောင်မှုအမျိုးအစား (Nature of Service & Signal Provider Disclaimer)</div>
+                <ul>
+                    <li>
+                        <b>အချက်ပြ ထုတ်လွှင့်သည့် နည်းပညာသက်သက်ဖြစ်ခြင်း (Signal & Information Provider):</b><br>
+                        Overlord သည် အလိုအလျောက် ကုန်သွယ်မှု အချက်ပြများ (Trading Signals / JSON Payloads) ကိုသာ အချိန်နှင့်တစ်ပြေးညီ ထုတ်လွှင့်ပေးသော နည်းပညာဆိုင်ရာ သတင်းအချက်အလက် ဝန်ဆောင်မှု (Data & Information Service) ဖြစ်သည်။ စနစ်သည် အသုံးပြုသူ၏ အကောင့်ထဲသို့ အော်ဒါများကို တိုက်ရိုက် ဝင်ရောက် အရောင်းအဝယ် ပြုလုပ်ပေးခြင်း မရှိပါ။
+                        <i>(Overlord is a technical data and information service that broadcasts automated trading signals / JSON payloads in real-time. The system does not directly enter or execute orders into the user's account.)</i>
+                    </li>
+                    <li>
+                        <b>ငွေရေးကြေးရေး အကြံပေး မဟုတ်ခြင်း (No Financial Advice):</b><br>
+                        ဤစနစ်သည် မည်သည့် ဘရိုကာ (Broker)၊ ငွေကြေး စီမံခန့်ခွဲမှု အဖွဲ့အစည်း (Asset Management) သို့မဟုတ် လိုင်စင်ရ ငွေကြေး အကြံပေး (Licensed Financial Advisor) မဟုတ်ပါ။ စနစ်မှ ထုတ်လွှင့်သော Signals များသည် ပညာပေးနှင့် နည်းပညာဆိုင်ရာ တွက်ချက်မှုများသာ ဖြစ်ပြီး ငွေကြေးဆိုင်ရာ တိုက်တွန်းချက် မဟုတ်ပါ။
+                        <i>(This system is not a broker, asset management organization, or licensed financial advisor. Signals broadcasted by the system are for educational and technical calculation purposes only and do not constitute financial solicitation.)</i>
+                    </li>
+                    <li>
+                        <b>ငွေကြေးနှင့် အကောင့် ထိန်းသိမ်းမှု ကင်းလွတ်ခြင်း (Non-Custodial):</b><br>
+                        ကျွန်ုပ်တို့သည် အသုံးပြုသူ၏ ငွေကြေးများကို လုံးဝ (လုံးဝ) လက်ခံ သိမ်းဆည်းခြင်း၊ ထိန်းသိမ်းပေးခြင်း မပြုလုပ်ပါ။
+                        <i>(We do not accept, hold, or custody users' funds or assets under any circumstances.)</i>
+                    </li>
+                    <li>
+                        <b>ပြင်ပ Execution Tool များနှင့် ချိတ်ဆက်မှု (Third-Party Integration):</b><br>
+                        အသုံးပြုသူသည် Overlord မှ ထွက်ရှိလာသော Signal များကို အသုံးပြု၍ Cornix, PineConnector, SignalStack သို့မဟုတ် ကိုယ်ပိုင် Webhooks များမှတစ်ဆင့် အလိုအလျောက် ကုန်သွယ်မှု ပြုလုပ်ခြင်းသည် အသုံးပြုသူ၏ ကိုယ်ပိုင် ရွေးချယ်မှုနှင့် တာဝန်သာ ဖြစ်သည်။ အဆိုပါ ပြင်ပ ဝန်ဆောင်မှုများ၏ ချို့ယွင်းချက်အတွက် Overlord တွင် တာဝန်မရှိပါ။
+                        <i>(Executing automated trades using Overlord signals via third-party tools such as Cornix, PineConnector, SignalStack, or custom Webhooks is entirely the user's choice and responsibility. Overlord bears no responsibility for failures of such third-party services.)</i>
+                    </li>
+                </ul>
+
+                <div class="section-title">၂။ ဈေးကွက်အလိုက် စွန့်စားရမှုနှင့် အန္တရာယ် သတိပေးချက်များ (Multi-Asset Risk Disclosures)</div>
+                <ul>
+                    <li>
+                        <b>အမြတ်အစွန်း အာမမခံခြင်းနှင့် အရင်းအနှီး ဆုံးရှုံးနိုင်ခြေ (No Profit Guarantee & Capital Loss Risk):</b><br>
+                        ဘဏ္ဍာရေး ဈေးကွက်များသည် အလွန် အတက်အကျ ပြင်းထန်ပြီး ရင်းနှီးမြှုပ်နှံထားသော ငွေရင်း အားလုံး ဆုံးရှုံးသွားနိုင်ခြေ ရှိသည်။ စနစ်၏ ယခင် စမ်းသပ်မှု ရလဒ်များသည် အနာဂတ် အမြတ်အစွန်းအတွက် လုံးဝ အာမခံချက် မရှိပါ။ မိမိ လုံးဝ ဆုံးရှုံးခံနိုင်သည့် ပမာဏထက် ပို၍ မရင်းနှီးပါနှင့်။
+                        <i>(Financial markets are highly volatile, and there is a risk of losing all invested capital. Past test results of the system guarantee no future profits. Never invest more than you can afford to completely lose.)</i>
+                    </li>
+                    <li>
+                        <b>ဒစ်ဂျစ်တယ် ပိုင်ဆိုင်မှု ဈေးကွက် (Digital Assets / Crypto Risk):</b><br>
+                        ၂၄ နာရီပတ်လုံး အတက်အကျ လွန်စွာ ပြင်းထန်ခြင်း၊ Liquidity လျှော့ကျခြင်းနှင့် ကွန်ရက်/Exchange ပိတ်သွားနိုင်သည့် စွန့်စားရမှုများ ရှိသည်။
+                        <i>(There are risks of 24/7 extreme volatility, liquidity reduction, and potential network or exchange shutdowns.)</i>
+                    </li>
+                    <li>
+                        <b>နိုင်ငံတကာ ငွေကြေး ဈေးကွက် (Forex Market Risk):</b><br>
+                        High Leverage အသုံးပြုမှုကြောင့် လျှင်မြန်စွာ အရင်းပြောင် ဆုံးရှုံးနိုင်ခြင်း၊ စနေ/တနွေနေ့ ဈေးကွက်ပိတ်ချိန်များအပြီး Price Gap များကြောင့် Stop-Loss မထိဘဲ အရှုံးကြီးမားနိုင်သည့် စွန့်စားရမှုများ ရှိသည်။
+                        <i>(Risks include rapid capital depletion due to high leverage, and massive losses without triggering Stop-Loss due to price gaps after weekend market closures.)</i>
+                    </li>
+                    <li>
+                        <b>စတော့ခ် ဈေးကွက် (Stock Market Risk):</b><br>
+                        Pre-Market / After-Hours အပြောင်းအလဲများ၊ ကုမ္ပဏီ အစီရင်ခံစာ ထွက်ချိန်များတွင် Volatility ပြင်းထန်ပြီး Slippage ဖြစ်ပေါ်နိုင်ကြောင်း သဘောတူရမည်။
+                        <i>(Users must agree that extreme volatility and slippage can occur during pre-market/after-hours changes or corporate earnings report releases.)</i>
+                    </li>
+                </ul>
+
+                <div class="section-title">၃။ နည်းပညာ ကန့်သတ်ချက်နှင့် တာဝန်ယူမှု ကင်းလွတ်ခွင့် (Limitation of Liability & AS-IS Policy)</div>
+                <ul>
+                    <li>
+                        <b>ရှိရင်းစွဲ အခြေအနေအတိုင်း ပေးအပ်ခြင်း (AS-IS Policy):</b><br>
+                        ဤဆော့ဖ်ဝဲလ်ကို လက်ရှိ ရှိနေသည့် အခြေအနေအတိုင်းသာ ပေးအပ်ခြင်းဖြစ်ပြီး၊ နည်းပညာပိုင်းဆိုင်ရာ ချို့ယွင်းချက် (Bugs) သို့မဟုတ် Signal လွဲမှားမှုများ မရှိပါဟု အာမမခံပါ။
+                        <i>(This software is provided on an 'AS-IS' basis without warranties regarding technical bugs or signal inaccuracies.)</i>
+                    </li>
+                    <li>
+                        <b>Latency နှင့် Webhook ကြန့်ကြာမှုများ (Latency & Webhook Delays):</b><br>
+                        အင်တာနက် လိုင်းပြတ်တောက်ခြင်း၊ Server ကြန့်ကြာခြင်း (Latency)၊ Telegram API သို့မဟုတ် Webhook Network နှောင့်နှေးခြင်းကြောင့် Signal ရောက်ရှိမှု နောက်ကျခြင်းနှင့် Order မဝင်ခြင်းများအတွက် Developer တွင် တာဝန်မရှိပါ။
+                        <i>(The developer bears no responsibility for delayed signal delivery or unexecuted orders caused by internet outages, server latency, Telegram API delays, or webhook network lag.)</i>
+                    </li>
+                    <li>
+                        <b>တာဝန်ယူမှု သုညဖြစ်ခြင်း (Zero Liability Clause):</b><br>
+                        စနစ်မှ ထုတ်လွှင့်သော Signal များကို အသုံးပြု၍ အရောင်းအဝယ် လုပ်ဆောင်ရာတွင် စနစ် ချို့ယွင်းမှုကြောင့်ဖြစ်စေ၊ ဈေးကွက် အတက်အကျကြောင့်ဖြစ်စေ မည်မျှပင် ငွေကြေး ဆုံးရှုံးမှု ဖြစ်ပေါ်ပါစေ၊ သုံးစွဲသူသည် Developer/Overlord ထံမှ မည်သည့် တိုက်ရိုက် သို့မဟုတ် သွယ်ဝိုက် လျော်ကြေးကိုမှ တောင်းခံပိုင်ခွင့်၊ တရားစွဲဆိုပိုင်ခွင့် မရှိပါ။
+                        <i>(Regardless of any financial loss incurred from using signals due to system failure or market volatility, the user has no right to claim direct/indirect compensation or sue the Developer/Overlord.)</i>
+                    </li>
+                </ul>
+
+                <div class="section-title">၄။ API Key မသိမ်းဆည်းခြင်းနှင့် ပြင်ပ Tool ချိတ်ဆက်မှု မူဝါဒ (Zero API Key Retention Policy)</div>
+                <ul>
+                    <li>
+                        <b>API Keys များ တောင်းခံခြင်း လုံးဝ မပြုလုပ်ခြင်း (Zero API Key Request):</b><br>
+                        Overlord စနစ်သည် အသုံးပြုသူများ၏ Crypto Exchange သို့မဟုတ် Broker API Keys များကို <b>လုံးဝ (လုံးဝ) တောင်းခံခြင်း၊ ရယူခြင်း သို့မဟုတ် ဗဟိုဆာဗာတွင် သိမ်းဆည်းခြင်း မပြုလုပ်ပါ။</b>
+                        <i>(The Overlord system strictly does not request, obtain, or store users' Crypto Exchange or Broker API Keys on its central servers.)</i>
+                    </li>
+                    <li>
+                        <b>အသုံးပြုသူ ကိုယ်ပိုင် ချိတ်ဆက်မှု တာဝန် (User's Personal Integration Responsibility):</b><br>
+                        အသုံးပြုသူသည် Signal များကို အလိုအလျောက် ကုန်သွယ်လိုပါက မိမိ၏ ကိုယ်ပိုင် Cornix / PineConnector သို့မဟုတ် Webhook URL ကိုသာ အသုံးပြုရမည်ဖြစ်ပြီး၊ ထို ပြင်ပ Tool များတွင် API Key ထည့်သွင်းခြင်းနှင့် လုံခြုံရေး စီမံခန့်ခွဲခြင်းသည် အသုံးပြုသူ၏ ကိုယ်ပိုင် တာဝန်သာ ဖြစ်သည်။
+                        <i>(Users wishing to auto-trade signals must use their own Cornix, PineConnector, or Webhook URLs, and managing security and API keys in those third-party tools is solely the user's responsibility.)</i>
+                    </li>
+                </ul>
+
+                <div class="section-title">၅။ ငွေပေးချေမှု၊ ငွေကြေးခဝါချမှု တိုက်ဖျက်ရေး (AML) နှင့် စာရင်းအင်းဆိုင်ရာ မူဝါဒများ (Terms of Service, Payment & AML Compliance Policy)</div>
+                
+                <div class="sub-section-title">5.1 Terms of Service & Disclaimer (User Agreement) / အသုံးပြုမှု စည်းကမ်းချက်များနှင့် တာဝန်ယူမှုကင်းလွတ်ခွင့်</div>
+                <ul>
+                    <li>
+                        <b>No Refund & Final Sale Policy:</b> All subscription fees, service packages, and digital product purchases made to Overlord are <b>strictly non-refundable</b>. Once payment is successfully processed and access to the signal service or VIP channel is granted, no refunds, partial refunds, or chargebacks will be issued under any circumstances, including market volatility, trading losses, or account termination due to policy violations.
+                        <i>(မြန်မာဘာသာ: Overlord သို့ ပေးချေထားသော Subscription ကြေးများ၊ ဝန်ဆောင်မှု ပက်ကေ့ချ်များနှင့် ဒစ်ဂျစ်တယ်ပစ္စည်း ဝယ်ယူမှု အားလုံးသည် <b>လုံးဝ (လုံးဝ) ငွေပြန်အမ်း၍ မရပါ (Non-refundable)</b>။ ငွေပေးချေမှု အောင်မြင်ပြီး ဝင်ခွင့်ရရှိသွားပါက မည်သည့်အကြောင်းပြချက်ကြောင့်မျှ ငွေပြန်အမ်းခြင်း လုံးဝ ရှိမည်မဟုတ်ပါ။)</i>
+                    </li>
+                    <li>
+                        <b>Payment Method Restrictions (CEX Only):</b> To comply with international anti-money laundering regulations, payments via Personal Non-Custodial Wallets (such as Trust Wallet, MetaMask) are <b>strictly prohibited</b>. All USDT/Crypto payments must originate exclusively from regulated Centralized Exchanges (CEX) where the user has completed mandatory KYC verification (e.g., Binance, Bybit, OKX).
+                        <i>(မြန်မာဘာသာ: နိုင်ငံတကာ ငွေကြေးခဝါချမှု တိုက်ဖျက်ရေး စည်းမျဉ်းများနှင့်အညီ ကိုယ်ပိုင်ပိုက်ဆံအိတ်များ (Trust Wallet၊ MetaMask ကဲ့သို့သော Non-Custodial Wallets များ) မှ ငွေပေးချေခြင်းကို <b>တင်းကြပ်စွာ တားမြစ်သည်</b>။ KYC ပြီးသား တရားဝင် CEX များ (Binance, Bybit, OKX) မှသာ လွှဲပြောင်းလာရမည်။)</i>
+                    </li>
+                    <li>
+                        <b>Prohibition of Third-Party Payments:</b> The subscriber must use their own verified exchange account matching their registered identity. Third-party payments, proxy transfers, or payments from another person's account are strictly banned.
+                        <i>(မြန်မာဘာသာ: စာရင်းသွင်းသူသည် ၎င်းတို့၏ တရားဝင် အမည်ပေါက် ကိုယ်ပိုင် Exchange အကောင့်ကိုသာ အသုံးပြုရမည်။ တတိယလူ၏ အကောင့်မှ ငွေပေးချေခြင်းကို တင်းကြပ်စွာ တားမြစ်သည်။)</i>
+                    </li>
+                </ul>
+
+                <div class="sub-section-title">5.2 Anti-Money Laundering (AML) & Source of Funds Policy / ငွေကြေးခဝါချမှု တိုက်ဖျက်ရေး (AML) မူဝါဒ</div>
+                <ul>
+                    <li>
+                        <b>Source of Funds Verification:</b> Overlord reserves the absolute right to demand proof of source of funds, TxID verification, and exchange withdrawal history if a transaction triggers risk flags. Failure within 24 hours results in permanent termination.
+                        <i>(မြန်မာဘာသာ: ငွေပေးငွေယူမှုတွင် Risk Flag ဖြစ်ပေါ်လာပါက အရင်းအမြစ် အထောက်အထား၊ TxID နှင့် ထုတ်ယူမှု မှတ်တမ်းများကို တောင်းခံပိုင်ခွင့်ရှိသည်။ ၂၄ နာရီအတွင်း မတင်ပြနိုင်ပါက ဝန်ဆောင်မှုကို အပြီးအပိုင် ရပ်ဆိုင်းမည်။)</i>
+                    </li>
+                    <li>
+                        <b>Zero Tolerance for Tainted / Blacklisted Funds:</b> Any attempt to pay using illicit, stolen, hacked, or blockchain-flagged funds (Sanctioned Addresses, Darknet or Scam-associated USDT) will result in immediate security action.
+                        <i>(မြန်မာဘာသာ: တရားမဝင်သော၊ ခိုးယူထားသော၊ ဟက်ခံရသော သို့မဟုတ် Blockchain တွင် အလံပြခံထားရသော ငွေကြေးများဖြင့် ပေးချေရန် ကြိုးပမ်းမှုကို လုံးဝလက်မခံဘဲ ချက်ချင်း လုံခြုံရေး အရေးယူမည်။)</i>
+                    </li>
+                </ul>
+
+                <div class="sub-section-title">5.3 Standard Operating Procedure (SOP) for High-Risk / Tainted Transactions / အန္တရာယ်ကြီးမားသော ငွေလွှဲမှုများအတွက် SOP</div>
+                <ul>
+                    <li>
+                        <b>Immediate Service Termination:</b> The user's Telegram ID and API access will be permanently revoked within seconds of detection.
+                        <i>(မြန်မာဘာသာ: တွေ့ရှိသည့်အချိန်မှစ၍ စက္ကန့်ပိုင်းအတွင်း Telegram ID နှင့် ချိတ်ဆက်ခွင့်များကို အပြီးအပိုင် ဖြတ်တောက်မည်။)</i>
+                    </li>
+                    <li>
+                        <b>Strict Non-Refund & Asset Freezing:</b> No refunds or return of funds will be issued. Disputed assets will be isolated, frozen, and flagged internally as <code>FLAGGED_SECURITY_VIOLATION</code>.
+                        <i>(မြန်မာဘာသာ: ငွေပြန်အမ်းခြင်း လုံးဝမရှိဘဲ အငြင်းပွားဖွယ် ငွေများကို သီးသန့်ခွဲထုတ် အေးခဲသိမ်းဆည်းမည်။)</i>
+                    </li>
+                </ul>
+
+                <div class="sub-section-title">5.4 Accounting & Financial Recognition (CPA/Auditor Standard) / စာရင်းအင်းနှင့် ဘဏ္ဍာရေး စံနှုန်း</div>
+                <ul>
+                    <li>
+                        Verified CEX transactions will be recognized as earned revenue. Blocked/disputed assets will <b>not</b> be recorded as revenue and will be segregated into a <code>'Suspense / Security Hold'</code> ledger for corporate audits and legal protection.
+                        <i>(မြန်မာဘာသာ: အတည်ပြုပြီး CEX ငွေလွှဲမှုများကိုသာ ရရှိငွေအဖြစ် စာရင်းသွင်းမည်။ ပိတ်ဆို့ခံရသော ငွေများကို ဝင်ငွေအဖြစ် မသွင်းဘဲ စာရင်းစစ်ဆေးခြင်းအတွက် 'Suspense / Security Hold' စာရင်းဇယားခွဲဖြင့် သီးသန့် သိမ်းဆည်းမည်။)</i>
+                    </li>
+                </ul>
+
+                <div class="section-title">၆။ အဖွဲ့ဝင်များ လိုက်နာရမည့် စည်းကမ်းများ (User Conduct & Intellectual Property)</div>
+                <ul>
+                    <li>
+                        <b>မူပိုင်ခွင့် ကာကွယ်မှု (Intellectual Property Protection):</b><br>
+                        Overlord ၏ Trading Strategy၊ Algorithm Logic နှင့် Code များသည် Developer ၏ သီးသန့် မူပိုင်ခွင့် ဖြစ်သည်။
+                        <i>(Overlord's trading strategies, algorithm logic, and code are the exclusive intellectual property of the Developer.)</i>
+                    </li>
+                    <li>
+                        <b>Signal များ ပြန်လည် ရောင်းချမှု တားမြစ်ခြင်း (Prohibition of Signal Reselling):</b><br>
+                        Overlord မှ ထုတ်လွှင့်သော VIP Signal များနှင့် Webhook Payload များကို ပြင်ပသို့ ခွင့်ပြုချက်မရှိဘဲ ပြန်လည် ဖြန့်ဝေခြင်း၊ ပြန်လည် ရောင်းချခြင်း (Resell) များကို တင်းကျပ်စွာ တားမြစ်သည်။ ဖောက်ဖျက်ပါက အကောင့်အား ကြိုတင် အသိမပေးဘဲ အပြီးတိုင် ပိတ်သိမ်း (Ban) မည်ဖြစ်သည်။
+                        <i>(Unauthorized redistribution or resale of Overlord VIP signals and webhook payloads is strictly prohibited. Violators will have their accounts permanently banned without prior notice.)</i>
+                    </li>
+                </ul>
+
+                <div class="section-title">၇။ ဒေသတွင်း ဥပဒေများ၊ မြန်မာနိုင်ငံ ဥပဒေဆိုင်ရာ အသိပေးချက်နှင့် လိုက်နာမှု (Jurisdiction & Legal Compliance Disclaimer)</div>
+                <ul>
+                    <li>
+                        <b>ဒေသတွင်း ဥပဒေများ လိုက်နာရန် တာဝန် (Responsibility to Comply with Local Laws):</b><br>
+                        အသုံးပြုသူသည် မိမိ လက်ရှိ နေထိုင်ရာ သို့မဟုတ် သုံးစွဲရာ နိုင်ငံ/ဒေသ၏ ဘဏ္ဍာရေးဆိုင်ရာ ဥပဒေများနှင့် စည်းမျဉ်းများကို ကိုယ်တိုင် လိုက်နာရန် ရာနှုန်းပြည့် တာဝန်ရှိသည်။
+                        <i>(Users are 100% responsible for complying with the financial laws and regulations of their current country or region of residence/use.)</i>
+                    </li>
+                    <li>
+                        <b>မြန်မာနိုင်ငံ ဥပဒေဆိုင်ရာ အသိပေးချက် (Myanmar Legal Disclaimer):</b><br>
+                        မြန်မာနိုင်ငံ ဗဟိုဘဏ် (Central Bank of Myanmar - CBM) ၏ မူဝါဒများနှင့် သတိပေးချက်များအရ ဒစ်ဂျစ်တယ် ငွေကြေးများကို တရားဝင် ငွေကြေးအဖြစ် အသိအမှတ်ပြုထားခြင်း မရှိပါ။ Overlord သည် အချက်အလက်နှင့် နည်းပညာ ဆော့ဖ်ဝဲလ် ဝန်ဆောင်မှု သက်သက်သာ ဖြစ်ပြီး၊ မြန်မာနိုင်ငံ သို့မဟုတ် သက်ဆိုင်ရာ ဒေသတွင်း တားမြစ်ထားသော ငွေကြေး သို့မဟုတ် ကုန်သွယ်မှုများတွင် ပါဝင်ဆောင်ရွက်ရန် တိုက်တွန်းခြင်း မဟုတ်ပါ။ အဆိုပါ စည်းမျဉ်းများအား ဖောက်ဖျက်၍ အသုံးပြုပါက အသုံးပြုသူ၏ ကိုယ်ပိုင် တာဝန်သာ ဖြစ်သည်။
+                        <i>(According to Central Bank of Myanmar (CBM) policies, cryptocurrencies are not officially recognized as legal tender. Overlord is solely an information and technical software service, not urging participation in restricted local trades. Violations are strictly the user's sole responsibility.)</i>
+                    </li>
+                    <li>
+                        <b>နိုင်ငံတကာ လိုင်စင်း ကင်းလွတ်ခွင့် (International Licensing Exemption):</b><br>
+                        Overlord သည် မည်သည့် နိုင်ငံတွင်မျှ စေတနာဝန်ထမ်း သို့မဟုတ် စီးပွားရေးအရ လိုင်စင်ယူထားသော Broker သို့မဟုတ် Investment Fund မဟုတ်သည့်အတွက် Financial Regulation ဆိုင်ရာ တာဝန်ယူမှုများမှ ကင်းလွတ်ခွင့် ရှိသည်။
+                        <i>(Overlord is neither a volunteer nor a commercially licensed broker or investment fund in any country, granting exemptions from financial regulation liabilities.)</i>
+                    </li>
+                </ul>
+
+                <div class="section-title">၈။ အသုံးပြုသူ၏ နောက်ဆုံး အတည်ပြုချက် (Final User Declaration)</div>
+                <p>ဤစနစ်ကို စတင် အသုံးပြုသည်နှင့် အသုံးပြုသူသည် အောက်ပါ အချက်များကို အပြည့်အဝ သဘောတူပြီး ဖြစ်သည် -<br>
+                <i>(By starting to use this system, the user fully agrees to the following:)</i></p>
+                <ol>
+                    <li>
+                        ကျွန်ုပ်သည် အသက် ၁၈ နှစ်ပြည့်ပြီးသူ ဖြစ်ပြီး၊ Financial Markets (Crypto, Forex, Stock) ကုန်သွယ်ခြင်း၏ ဆုံးရှုံးနိုင်ခြေ ကြီးမားမှုကို အပြည့်အဝ နားလည် လက်ခံပါသည်။<br>
+                        <i>(I am at least 18 years old and fully understand and accept the high risks of trading in financial markets.)</i>
+                    </li>
+                    <li>
+                        Overlord သည် Signal ပေးပို့သော နည်းပညာ ဆော့ဖ်ဝဲလ်တစ်ခုသာ ဖြစ်ပြီး ငွေကြေး အကြံပေး သို့မဟုတ် Broker မဟုတ်ကြောင်း လက်ခံပါသည်။<br>
+                        <i>(I acknowledge that Overlord is only a signal-delivering technical software, not a financial advisor or broker.)</i>
+                    </li>
+                    <li>
+                        Overlord သည် ကျွန်ုပ်၏ Exchange API Keys များကို သိမ်းဆည်းထားခြင်း မရှိဘဲ၊ အော်ဒါဝင်ရောက်ခြင်းကို Cornix/Webhook စသည့် ပြင်ပ Tool များမှတစ်ဆင့် ကျွန်ုပ် ကိုယ်တိုင် စီမံရမည်ဖြစ်ကြောင်း နားလည်ပါသည်။<br>
+                        <i>(I understand that Overlord does not store my exchange API keys, and I must manage order entry myself via third-party tools like Cornix/Webhooks.)</i>
+                    </li>
+                    <li>
+                        ကျွန်ုပ် လက်ရှိနေထိုင်ရာ ဒေသ (မြန်မာနိုင်ငံ အပါအဝင်) ၏ ဘဏ္ဍာရေးနှင့် Crypto ဆိုင်ရာ ဥပဒေများကို ကိုယ်တိုင် လိုက်နာပါမည်။<br>
+                        <i>(I will personally comply with the financial and crypto regulations of my current region of residence including Myanmar.)</i>
+                    </li>
+                    <li>
+                        စနစ် ချို့ယွင်းမှု၊ အင်တာနက် ပြဿနာ သို့မဟုတ် ဈေးကွက် အတက်အကျကြောင့် ဖြစ်ပေါ်လာမည့် မည်သည့် ငွေကြေး ဆုံးရှုံးမှု အတွက်မဆို Overlord သို့မဟုတ် Developer ထံမှ လျော်ကြေး တောင်းခံခြင်း၊ တရားစွဲဆိုခြင်း လုံးဝ (လုံးဝ) ပြုလုပ်မည် မဟုတ်ပါ။<br>
+                        <i>(I will never claim compensation or take legal action against Overlord or the Developer for any financial loss caused by system glitches, internet issues, or market volatility.)</i>
+                    </li>
+                    <li>
+                        စနစ်လုံခြုံရေးနှင့် Group ဝင်ခွင့် (Join Request) များကို တိတိကျကျ စစ်ဆေးနိုင်ရန်အတွက်သာ သင့်၏ Telegram User ID နှင့် Name ကို လုံခြုံသော Cloud Database တွင် ယာယီမှတ်သားထားမည်ကို လက်ခံပါသည်။ အခြားမည်သည့် ကိုယ်ရေးကိုယ်တာ အချက်အလက် (ဥပမာ - ဖုန်းနံပါတ်၊ နေရပ်လိပ်စာ) ကိုမျှ ကောက်ယူမည်မဟုတ်ဘဲ၊ ပြင်ပသို့ မျှဝေမည်မဟုတ်ပါ။ သင် Group မှ ထွက်ခွာသွားပါက ထိုအချက်အလက်များကို Database မှ အလိုအလျောက် ဖျက်ပစ်မည် ဖြစ်သည်။<br>
+                        <i>(I agree that for system security and join request verification, only my Telegram User ID and Name will be temporarily stored in a secure cloud database. No other personal data will be collected or shared with third parties, and this data will be automatically deleted upon leaving the group.)</i>
+                    </li>
+                </ol>
+
+            </div>
+
+            <!-- Scroll Status Hint -->
+            <div id="scrollHint" class="scroll-hint">⚠️ စည်းမျဉ်းများကို အောက်ဆုံးအထိ Scroll ဆွဲဖတ်ပါ။</div>
+
+            <!-- Export PDF Button -->
+            <div class="pdf-btn-wrapper">
+                <button type="button" id="downloadPdfBtn" class="pdf-btn">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    Download / Save as PDF
+                </button>
+            </div>
+
+            <!-- Acceptance Action Box -->
+            <div class="action-box">
+                <label class="checkbox-label disabled" id="checkboxLabel">
+                    <input type="checkbox" id="agreeCheckbox" disabled style="transform: scale(1.3); margin-right: 12px; accent-color: var(--accent-color);">
+                    အထက်ပါ စည်းမျဉ်းစည်းကမ်းများနှင့် မူဝါဒများကို ဖတ်ရှုပြီး သဘောတူလက်ခံပါသည်။
+                </label>
+
+                <div class="btn-group">
+                    <button id="confirmBtn" class="btn-confirm" disabled>လက်ခံပါသည် (Confirm)</button>
+                    <button id="rejectBtn" class="btn-reject">လက်မခံပါ (Reject)</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // 1. Telegram WebApp Initialization
+        const tg = window.Telegram ? window.Telegram.WebApp : null;
+        if (tg) {
+            tg.ready();
+            tg.expand();
+        }
+
+        // 2. Query Parameters & Telegram Native Fallback
+        const urlParams = new URLSearchParams(window.location.search);
+        const userIdFromUrl = urlParams.get('user_id');
+        const tgUserId = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) ? tg.initDataUnsafe.user.id : '';
+        const finalUserId = userIdFromUrl || tgUserId;
+
+        // DOM Elements
+        const tosContent = document.getElementById('tosContent');
+        const scrollHint = document.getElementById('scrollHint');
+        const checkbox = document.getElementById('agreeCheckbox');
+        const checkboxLabel = document.getElementById('checkboxLabel');
+        const confirmBtn = document.getElementById('confirmBtn');
+        const rejectBtn = document.getElementById('rejectBtn');
+        const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+
+        let hasScrolledToBottom = false;
+
+        // Function to Unlock Checkbox
+        function unlockCheckbox() {
+            if (!hasScrolledToBottom) {
+                hasScrolledToBottom = true;
+                checkbox.disabled = false;
+                checkboxLabel.classList.remove('disabled');
+                scrollHint.style.background = '#f0fdf4';
+                scrollHint.style.borderColor = '#bbf7d0';
+                scrollHint.style.color = '#16a34a';
+                scrollHint.innerHTML = '✅ စည်းမျဉ်းများကို အပြည့်အစုံ ဖတ်ရှုပြီးပါပြီ။ အောက်ပါ Checkbox တွင် အမှန်ခြစ်ပါ။';
+            }
+        }
+
+        // Check if Scroll is needed (for Large Displays/Tablets)
+        function checkInitialScrollState() {
+            if (tosContent.scrollHeight <= tosContent.clientHeight + 25) {
+                unlockCheckbox();
+            }
+        }
+
+        // 3. Scroll Event Listener
+        tosContent.addEventListener('scroll', function() {
+            const threshold = 25;
+            const isAtBottom = Math.ceil(tosContent.scrollTop + tosContent.clientHeight) >= (tosContent.scrollHeight - threshold);
+            
+            if (isAtBottom) {
+                unlockCheckbox();
+            }
+        });
+
+        window.addEventListener('load', checkInitialScrollState);
+        window.addEventListener('resize', checkInitialScrollState);
+        if (document.fonts) {
+            document.fonts.ready.then(checkInitialScrollState);
+        }
+        if (tg) {
+            tg.onEvent('viewportChanged', checkInitialScrollState);
+        }
+
+        // 4. Checkbox State Change
+        checkbox.addEventListener('change', function() {
+            confirmBtn.disabled = !this.checked;
+            confirmBtn.style.cursor = this.checked ? 'pointer' : 'not-allowed';
+            confirmBtn.style.opacity = this.checked ? '1' : '0.5';
+        });
+
+        // 5. Print/PDF Download Trigger
+        downloadPdfBtn.addEventListener('click', () => window.print());
+
+        // 6. API Interaction Handler
+        async function sendTosAction(actionType) {
+            if (tg && tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('medium');
+            }
+
+            const initData = tg ? tg.initData : '';
+            
+            confirmBtn.disabled = true;
+            rejectBtn.disabled = true;
+            
+            const originalConfirmText = confirmBtn.innerText;
+            const originalRejectText = rejectBtn.innerText;
+            
+            if (actionType === 'tos_agree') {
+                confirmBtn.innerText = "ခဏစောင့်ပါ...";
+            } else {
+                rejectBtn.innerText = "ခဏစောင့်ပါ...";
+            }
+
+            const payload = {
+                initData: initData,
+                user_id: finalUserId,
+                action: actionType
+            };
+
+            try {
+                // Cloudflare Worker API Endpoint
+                const apiUrl = 'https://your-worker-name.your-username.workers.dev/api/tos-agree';
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    if (tg && tg.HapticFeedback) {
+                        tg.HapticFeedback.notificationOccurred('success'); 
+                    }
+
+                    const message = actionType === 'tos_agree' 
+                        ? "✅ စည်းမျဉ်းများကို လက်ခံအတည်ပြုပြီးပါပြီ။" 
+                        : "❌ စည်းမျဉ်းများကို ငြင်းပယ်လိုက်ပါသည်။";
+
+                    if (tg) {
+                        tg.showAlert(message, () => tg.close());
+                    } else {
+                        alert(message);
+                        document.body.innerHTML = `<div style="text-align:center; padding:50px; font-family: 'Noto Sans Myanmar', sans-serif;"><h2>${message}</h2><p>ဤ Page ကို ပိတ်လိုက်လို့ရပါပြီ။</p></div>`;
+                    }
+                } else {
+                    if (tg && tg.HapticFeedback) {
+                        tg.HapticFeedback.notificationOccurred('error'); 
+                    }
+
+                    const errorMsg = result.error || "လုပ်ဆောင်မှု မအောင်မြင်ပါ။";
+                    tg ? tg.showAlert("⚠️ Error: " + errorMsg) : alert("⚠️ Error: " + errorMsg);
+                    
+                    confirmBtn.innerText = originalConfirmText;
+                    rejectBtn.innerText = originalRejectText;
+                    confirmBtn.disabled = !checkbox.checked;
+                    rejectBtn.disabled = false;
+                }
+            } catch (err) {
+                if (tg && tg.HapticFeedback) {
+                    tg.HapticFeedback.notificationOccurred('error'); 
+                }
+
+                const netErr = "Network Error: " + err.message;
+                tg ? tg.showAlert("⚠️ " + netErr) : alert("⚠️ " + netErr);
+                
+                confirmBtn.innerText = originalConfirmText;
+                rejectBtn.innerText = originalRejectText;
+                confirmBtn.disabled = !checkbox.checked;
+                rejectBtn.disabled = false;
+            }
+        }
+
+        // 7. Event Listeners for Actions
+        confirmBtn.addEventListener('click', function() {
+            if (checkbox.checked) sendTosAction('tos_agree');
+        });
+
+        rejectBtn.addEventListener('click', function() {
+            sendTosAction('tos_reject');
+        });
+    </script>
+</body>
+</html>
