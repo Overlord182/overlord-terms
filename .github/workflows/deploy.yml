@@ -6,26 +6,37 @@ on:
       - main  # မိမိ main branch နာမည်ဖြစ်ရမည်
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
 
 jobs:
   deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Push Protection မမိစေရန် Base64 Encoding ဖြင့် Key များ ထည့်သွင်းခြင်း
       - name: Inject Secrets into Code
         run: |
-          Y_KEY=$(echo -n "${{ secrets.YOUTUBE_API_KEY }}" | base64 -w 0)
-          G_KEY=$(echo -n "${{ secrets.GEMINI_API_KEY }}" | base64 -w 0)
-          
-          sed -i "s/__YOUTUBE_API_KEY__/$(echo $Y_KEY | base64 -d)/g" *.html
-          sed -i "s/__GEMINI_API_KEY__/$(echo $G_KEY | base64 -d)/g" *.html
+          sed -i "s/__YOUTUBE_API_KEY__/${{ secrets.YOUTUBE_API_KEY }}/g" *.html
+          sed -i "s/__GEMINI_API_KEY__/${{ secrets.GEMINI_API_KEY }}/g" *.html
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./
+        id: deployment
+        uses: actions/deploy-pages@v4
