@@ -1,0 +1,26 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main  # မိမိ၏ main branch နာမည်ဖြစ်ရမည်
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Placeholder များကို GitHub Secrets ထဲမှ Key များနှင့် အစားထိုးခြင်း
+      - name: Inject Secrets into Code
+        run: |
+          sed -i 's/__YOUTUBE_API_KEY__/${{ secrets.YOUTUBE_API_KEY }}/g' index.html
+          sed -i 's/__GEMINI_API_KEY__/${{ secrets.GEMINI_API_KEY }}/g' index.html
+
+      # GitHub Pages သို့ Auto Deploy တင်ခြင်း
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
