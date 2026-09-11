@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main
+      - main  # မိမိ main branch နာမည်ဖြစ်ရမည် (master ဆိုပါက master ဟုပြင်ပါ)
 
 permissions:
   contents: write
@@ -15,11 +15,13 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # HTML ဖိုင်အားလုံး (*.html) ထဲတွင် Key များကို အစားထိုးခိုင်းခြင်း
       - name: Inject Secrets into Code
         run: |
-          sed -i 's/__YOUTUBE_API_KEY__/${{ secrets.YOUTUBE_API_KEY }}/g' *.html
-          sed -i 's/__GEMINI_API_KEY__/${{ secrets.GEMINI_API_KEY }}/g' *.html
+          Y_KEY=$(echo -n "${{ secrets.YOUTUBE_API_KEY }}" | base64 -w 0)
+          G_KEY=$(echo -n "${{ secrets.GEMINI_API_KEY }}" | base64 -w 0)
+          
+          sed -i "s/__YOUTUBE_API_KEY__/$(echo $Y_KEY | base64 -d)/g" *.html
+          sed -i "s/__GEMINI_API_KEY__/$(echo $G_KEY | base64 -d)/g" *.html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
