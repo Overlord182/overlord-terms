@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="robots" content="noindex, nofollow">
-    <title>Overlord Bot Guide & Dynamic Search Player</title>
+    <title>Overlord Bot Guide & Dynamic Learning Hub</title>
 
     <!-- Telegram WebApp JS SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -20,6 +20,9 @@
             --hint-color: var(--tg-theme-hint-color, #aaaaaa);
             --btn-color: var(--tg-theme-button-color, #2481cc);
             --btn-text-color: var(--tg-theme-button-text-color, #ffffff);
+            --badge-course: #ff9800;
+            --badge-playlist: #2196f3;
+            --badge-free: #4caf50;
         }
 
         * {
@@ -56,6 +59,7 @@
         .header-text h2 {
             margin: 0 0 8px 0;
             font-size: 1.2rem;
+            color: #ffffff;
         }
 
         .header-text p {
@@ -114,6 +118,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            white-space: nowrap;
         }
 
         .hud-indicator.show {
@@ -192,7 +197,7 @@
                 padding: 0;
                 background-color: #000;
             }
-            .header-text, .controls-bar, .search-box-container, .playlist-section {
+            .header-text, .controls-bar, .search-box-container, .learning-hub-section, .playlist-section {
                 display: none !important;
             }
             .video-container {
@@ -287,7 +292,101 @@
             border-color: var(--btn-color);
         }
 
-        /* Playlist Queue Section */
+        /* Categorized Video / Playlist Hub Section */
+        .learning-hub-section {
+            width: 100%;
+            max-width: 800px;
+            margin-top: 20px;
+        }
+
+        .category-header {
+            font-weight: bold;
+            margin: 18px 0 10px 0;
+            color: #ffbc00;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 6px;
+        }
+
+        .item-card-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .item-card {
+            display: flex;
+            gap: 12px;
+            background: var(--card-bg);
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s, border 0.2s;
+            border-left: 4px solid transparent;
+        }
+
+        .item-card:active, .item-card.active {
+            background: #2a2a2a;
+            border-left-color: var(--primary-color);
+        }
+
+        .item-thumb-wrapper {
+            position: relative;
+            width: 110px;
+            aspect-ratio: 16 / 9;
+            flex-shrink: 0;
+        }
+
+        .item-thumb {
+            width: 100%;
+            height: 100%;
+            border-radius: 6px;
+            object-fit: cover;
+        }
+
+        .playlist-badge-icon {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            font-size: 0.65rem;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .item-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .item-info h4 {
+            margin: 0 0 6px 0;
+            font-size: 0.88rem;
+            color: #ffffff;
+            line-height: 1.3;
+        }
+
+        .badge-tag {
+            display: inline-block;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #fff;
+            font-weight: bold;
+            width: fit-content;
+        }
+
+        .badge-course { background-color: var(--badge-course); }
+        .badge-playlist { background-color: var(--badge-playlist); }
+        .badge-free { background-color: var(--badge-free); }
+
+        /* Dynamic Playlist Queue Section (Search / RSS) */
         .playlist-section {
             width: 100%;
             max-width: 800px;
@@ -352,8 +451,8 @@
 <body oncontextmenu="return false;">
 
     <div class="header-text" id="headerText">
-        <h2>Overlord Bot အသုံးပြုနည်း လမ်းညွှန်</h2>
-        <p>Bot ကို စတင်အသုံးပြုပုံနှင့် Signal များဖတ်နည်း လမ်းညွှန် ဗီဒီယိုများ</p>
+        <h2>Overlord Bot & Trading Learning Hub</h2>
+        <p>Bot သင်ခန်းစာများ၊ Signal ဖတ်နည်းများနှင့် အခမဲ့ Trading သင်တန်းများ စုစည်းမှု</p>
     </div>
 
     <!-- Video Player Container -->
@@ -363,8 +462,8 @@
 
         <iframe 
             id="ytPlayer"
-            src="https://www.youtube.com/embed/videoseries?list=PLATyixI4j2D8&enablejsapi=1&rel=0&modestbranding=1&hl=my&cc_lang_pref=my&cc_load_policy=1"
-            title="Overlord Bot Guide" 
+            src="https://www.youtube.com/embed/M7lc1UVf-VE?enablejsapi=1&rel=0&modestbranding=1&hl=my&cc_lang_pref=my&cc_load_policy=1"
+            title="Overlord Player" 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
             allowfullscreen>
         </iframe>
@@ -416,9 +515,12 @@
         <button class="btn-control" onclick="performSearch()">🔍 ရှာမည်</button>
     </div>
 
-    <!-- Playlist Queue Section -->
+    <!-- Learning Categories & Playlist Hub Section -->
+    <div class="learning-hub-section" id="learningHubContainer"></div>
+
+    <!-- Dynamic Search / RSS Queue Section -->
     <div class="playlist-section">
-        <div class="playlist-title" id="playlistTitleHeader">📚 လမ်းညွှန် ဗီဒီယိုများ စာရင်း</div>
+        <div class="playlist-title" id="playlistTitleHeader">📚 RSS / ရှာဖွေတွေ့ရှိချက်များ စာရင်း</div>
         <div class="video-list" id="videoListContainer"></div>
     </div>
 
@@ -447,7 +549,64 @@
         const timeDisplay = document.getElementById('timeDisplay');
         const searchInput = document.getElementById('searchInput');
 
-        // Initial Playlist Data
+        // -------------------------------------------------------------
+        // 📚 1. Course Data Structure (Categories, Unlisted Videos & Playlists)
+        // -------------------------------------------------------------
+        const courseData = [
+            {
+                category: "🤖 Overlord Bot တရားဝင် သင်ခန်းစာများ (Private Course)",
+                items: [
+                    { 
+                        type: "video", 
+                        id: "M7lc1UVf-VE", 
+                        title: "၁။ Overlord Bot အခြေခံ အသုံးပြုနည်း", 
+                        tag: "Private Course", 
+                        badgeClass: "badge-course" 
+                    },
+                    { 
+                        type: "video", 
+                        id: "L_LUpnjgPso", 
+                        title: "၂။ Signal များဖတ်ပြီး Trade ဝင်နည်း", 
+                        tag: "Private Course", 
+                        badgeClass: "badge-course" 
+                    },
+                    { 
+                        type: "video", 
+                        id: "fJ9rUzIMcZQ", 
+                        title: "၃။ Risk Management နှင့် Stop Loss ပြင်ဆင်နည်း", 
+                        tag: "Private Course", 
+                        badgeClass: "badge-course" 
+                    }
+                ]
+            },
+            {
+                category: "📊 Technical Analysis & Full Courses (External Playlists)",
+                items: [
+                    { 
+                        type: "playlist", 
+                        id: "PLrAXtmErZgOdP_8G_RyeyC3I", // External Playlist ID
+                        thumbVideoId: "M7lc1UVf-VE",    // Cover Thumbnail အတွက် Video ID
+                        title: "Technical Analysis အခမဲ့ Full Course (Playlist)", 
+                        tag: "📺 Full Playlist", 
+                        badgeClass: "badge-playlist" 
+                    }
+                ]
+            },
+            {
+                category: "💡 Trading Psychology & Free Basics (Individual Videos)",
+                items: [
+                    { 
+                        type: "video", 
+                        id: "M7lc1UVf-VE", 
+                        title: "Candlestick Pattern အခြေခံ ဖတ်နည်း", 
+                        tag: "Free YouTube", 
+                        badgeClass: "badge-free" 
+                    }
+                ]
+            }
+        ];
+
+        // Dynamic RSS/Search Queue Data
         let playlistData = [
             { id: "M7lc1UVf-VE", title: "၁။ Overlord Bot အခြေခံ အသုံးပြုနည်း", duration: "05:20" },
             { id: "L_LUpnjgPso", title: "၂။ Signal များဖတ်ပြီး Trade ဝင်နည်း", duration: "08:15" },
@@ -504,12 +663,16 @@
             }
         }
 
+        // -------------------------------------------------------------
+        // 🎬 2. YouTube iFrame API Init & Player Events
+        // -------------------------------------------------------------
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('ytPlayer', {
                 events: {
                     'onReady': () => { 
                         isPlayerReady = true; 
                         updateQualityMenu();
+                        renderCategorizedHub();
                         renderPlaylist();
 
                         // Resume position & Video from LocalStorage
@@ -541,7 +704,7 @@
             });
         }
 
-        // Link Protection & Context Prevention
+        // Security, Link Protection & Context Prevention
         document.addEventListener('contextmenu', (e) => {
             if (e.target.tagName !== 'INPUT') e.preventDefault();
         });
@@ -556,7 +719,77 @@
             }
         });
 
-        // Search & Direct Link Logic
+        // -------------------------------------------------------------
+        // 🛠️ 3. UI Rendering Engine (Categories Hub)
+        // -------------------------------------------------------------
+        function renderCategorizedHub() {
+            const container = document.getElementById('learningHubContainer');
+            container.innerHTML = '';
+
+            courseData.forEach((section) => {
+                const header = document.createElement('div');
+                header.className = 'category-header';
+                header.textContent = section.category;
+                container.appendChild(header);
+
+                const cardList = document.createElement('div');
+                cardList.className = 'item-card-list';
+
+                section.items.forEach((item) => {
+                    const card = document.createElement('div');
+                    card.className = 'item-card';
+                    card.onclick = () => playItem(item, card);
+
+                    let thumbUrl = "";
+                    if (item.type === "video") {
+                        thumbUrl = `https://img.youtube.com/vi/${item.id}/mqdefault.jpg`;
+                    } else if (item.type === "playlist") {
+                        const coverId = item.thumbVideoId || "M7lc1UVf-VE";
+                        thumbUrl = `https://img.youtube.com/vi/${coverId}/mqdefault.jpg`;
+                    }
+
+                    card.innerHTML = `
+                        <div class="item-thumb-wrapper">
+                            <img class="item-thumb" src="${thumbUrl}">
+                            ${item.type === 'playlist' ? '<span class="playlist-badge-icon">☰ PLAYLIST</span>' : ''}
+                        </div>
+                        <div class="item-info">
+                            <h4>${item.title}</h4>
+                            <span class="badge-tag ${item.badgeClass}">${item.tag}</span>
+                        </div>
+                    `;
+                    cardList.appendChild(card);
+                });
+
+                container.appendChild(cardList);
+            });
+        }
+
+        function playItem(item, cardElement) {
+            if (!isPlayerReady) return;
+
+            document.querySelectorAll('.item-card').forEach(c => c.classList.remove('active'));
+            if (cardElement) cardElement.classList.add('active');
+
+            if (item.type === "video") {
+                player.loadVideoById(item.id);
+                showHUD(`▶ ${item.title}`);
+                if (isVoiceOverEnabled) speakText(item.title, 'en-US');
+            } else if (item.type === "playlist") {
+                player.loadPlaylist({
+                    listType: 'playlist',
+                    list: item.id,
+                    index: 0,
+                    startSeconds: 0
+                });
+                showHUD(`📺 Playlist Loaded: ${item.title}`);
+                if (isVoiceOverEnabled) speakText("Playlist loaded", 'en-US');
+            }
+        }
+
+        // -------------------------------------------------------------
+        // 🔍 4. Search & Direct Link Logic
+        // -------------------------------------------------------------
         function extractVideoId(url) {
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
             const match = url.match(regExp);
@@ -609,7 +842,7 @@
             }
         }
 
-        // Playlist Functions
+        // Dynamic Playlist Functions
         function renderPlaylist() {
             const container = document.getElementById('videoListContainer');
             container.innerHTML = '';
@@ -657,7 +890,9 @@
             showHUD("⏮ ရှေ့တစ်ပုဒ်");
         }
 
-        // Progress Scrubber Bar Loop
+        // -------------------------------------------------------------
+        // ⏱️ 5. Progress Scrubber Bar & Loop
+        // -------------------------------------------------------------
         seekInput.addEventListener('input', (e) => {
             isSeeking = true;
             progressFill.style.width = e.target.value + '%';
@@ -699,7 +934,9 @@
             return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
         }
 
-        // Speech Engine (TTS)
+        // -------------------------------------------------------------
+        // 🗣️ 6. Speech Engine (TTS) & Subtitle / Quality Controls
+        // -------------------------------------------------------------
         function speakText(text, lang = 'en-US') {
             if (!('speechSynthesis' in window) || !isVoiceOverEnabled) return;
             window.speechSynthesis.cancel();
@@ -723,7 +960,6 @@
             }
         }
 
-        // Subtitles & Quality Control
         function changeSubtitle(langCode) {
             if (!isPlayerReady) return;
             if (langCode === 'off') {
@@ -768,7 +1004,9 @@
             showHUD(`⚙️ Quality: ${formatQualityName(val)}`);
         }
 
-        // Touch Gesture Logic
+        // -------------------------------------------------------------
+        // 👆 7. Touch Gesture Engine (Pinch Zoom, Brightness, Volume, Seek)
+        // -------------------------------------------------------------
         let touchStartX = 0, touchStartY = 0;
         let currentBrightness = 1.0, currentVolume = 100, currentZoom = 1.0;
         let initialPinchDist = 0, lastTapTime = 0, tapTimeout;
@@ -779,7 +1017,7 @@
             hudIndicator.textContent = text;
             hudIndicator.classList.add('show');
             clearTimeout(hudTimeout);
-            hudTimeout = setTimeout(() => hudIndicator.classList.remove('show'), 1000);
+            hudTimeout = setTimeout(() => hudIndicator.classList.remove('show'), 1200);
         }
 
         function getDistance(t1, t2) {
@@ -892,6 +1130,9 @@
             }
         }
 
+        // -------------------------------------------------------------
+        // 🖥️ 8. Fullscreen Mode & Telegram Haptics
+        // -------------------------------------------------------------
         function toggleManualFullscreen() {
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
             const isFullscreen = videoBox.classList.contains('custom-fullscreen');
