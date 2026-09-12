@@ -1,10 +1,14 @@
-name: Deploy to GitHub Pages
+name: Deploy Website to GitHub Pages
 
 on:
   push:
     branches:
       - main  # မိမိ main branch နာမည်ဖြစ်ရမည်
+    paths:
+      - 'user_guide_youtube.html' # user_guide_youtube.html ဖိုင် ပြောင်းလဲမှသာ ဒီ workflow အလုပ်လုပ်မည်
+      - '**.html'                # သို့မဟုတ် HTML ဖိုင်များ ပြောင်းလဲပါက အလုပ်လုပ်မည်
 
+# GitHub Pages သို့ deploy လုပ်ရန် ခွင့်ပြုချက် (Permissions) ပေးခြင်း
 permissions:
   contents: read
   pages: write
@@ -21,7 +25,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Inject Secrets into Code
@@ -32,9 +36,10 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload artifact
+      - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
         with:
+          # Repository ရဲ့ root folder (user_guide_youtube.html ရှိသည့်နေရာ) ကို upload တင်မည်
           path: '.'
 
       - name: Deploy to GitHub Pages
