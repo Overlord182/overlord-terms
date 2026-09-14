@@ -25,7 +25,6 @@
             --badge-free: #4caf50;
         }
 
-        /* Anti-Copy & Anti-Selection Protection */
         * {
             box-sizing: border-box;
             -webkit-user-select: none;
@@ -33,20 +32,6 @@
             -ms-user-select: none;
             user-select: none;
             -webkit-touch-callout: none;
-        }
-
-        /* ဓာတ်ပုံ၊ စာသားနှင့် ဗီဒီယိုများကို တွဲလောင်းကျ၍ Save / Drag လုပ်မရအောင် ကာကွယ်ခြင်း */
-        body, img, video, iframe, .script-document, .whiteboard-card {
-            -webkit-user-select: none !important;
-            user-select: none !important;
-            -webkit-touch-callout: none !important;
-            -webkit-user-drag: none !important;
-        }
-
-        /* Search Input တွင်မူ စာရိုက်၍ ရှာဖွေနိုင်ရန် အပ외ခံ ကင်းလွတ်ခွင့်ပြုထားသည် */
-        .search-input {
-            -webkit-user-select: text !important;
-            user-select: text !important;
         }
 
         body {
@@ -102,18 +87,6 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
             transition: all 0.3s ease;
             touch-action: none;
-        }
-
-        /* YouTube သို့ လုံးဝမရောက်စေရန် အပေါ်မှ Invisible Shield ထပ်ဆင့်ကာကွယ်ခြင်း */
-        .video-shield-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: calc(100% - 50px);
-            z-index: 50;
-            background: transparent;
-            pointer-events: none; /* Controls များကို ပုံမှန်နှိပ်နိုင်စေရန် */
         }
 
         /* On-Screen Quick Control Overlay */
@@ -436,6 +409,8 @@
             border-radius: 8px;
             font-size: 0.9rem;
             outline: none;
+            -webkit-user-select: text;
+            user-select: text;
         }
 
         .search-input:focus {
@@ -610,9 +585,6 @@
     <div class="video-container" id="videoBox">
         <div class="hud-indicator" id="hudIndicator"></div>
 
-        <!-- YouTube သို့ အလွယ်တကူ မရောက်စေရန် ကာကွယ်ထားသော Shield Layer -->
-        <div class="video-shield-layer"></div>
-
         <!-- On-screen Quick Controls -->
         <div class="onscreen-quick-controls">
             <button class="onscreen-btn" onclick="toggleSubtitlesQuick()">💬 CC</button>
@@ -623,7 +595,7 @@
 
         <iframe 
             id="ytPlayer"
-            src="https://www.youtube.com/embed/videoseries?list=PLATyixI4j2D8&enablejsapi=1&controls=1&modestbranding=1&rel=0&iv_load_policy=3" 
+            src="https://www.youtube.com/embed/videoseries?list=PLATyixI4j2D8&enablejsapi=1&controls=1" 
             title="Overlord Bot Guide" 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
             allowfullscreen>
@@ -680,7 +652,7 @@
 
     <!-- Interactive YouTube Search Bar Section -->
     <div class="search-box-container">
-        <input type="text" id="searchInput" class="search-input" placeholder="YouTube Link, Video ID (သို့) စာသားရိုက်၍ ရှာပါ..." onkeydown="if(event.key==='Enter') performSearch()">
+        <input type="text" id="searchInput" class="search-input" placeholder="YouTube Link, Video ID (သို့) စာသားရိုက်၍ ရှာပါ..." oninput="liveFilterLocal()" onkeydown="if(event.key==='Enter') performSearch()">
         <button class="btn-control" onclick="performSearch()">🔍 ရှာမည်</button>
     </div>
 
@@ -761,7 +733,15 @@
         ];
 
         let activeLineIndex = -1;
+        
+        // Multi-level Cache (Video ID -> Language -> Script Array)
+        const translationCache = {
+            "M7lc1UVf-VE": {
+                "Myanmar": originalLessonData
+            }
+        };
 
+        // API Key မလိုဘဲ RSS Feed မှတစ်ဆင့် Playlist/Channel ဗီဒီယိုများ ဆွဲယူခြင်း
         async function fetchVideosFromRSS() {
             let rssUrl = "";
             if (PLAYLIST_ID && PLAYLIST_ID.length > 5) {
@@ -805,6 +785,9 @@
             }
         }
 
+        // -------------------------------------------------------------
+        //  2. YouTube iFrame API Init & Player Events
+        // -------------------------------------------------------------
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('ytPlayer', {
                 events: {
@@ -815,6 +798,7 @@
                         renderPlaylist();
                         renderScriptDocument(originalLessonData);
 
+                        // Resume position & Video from LocalStorage
                         const savedVideoId = localStorage.getItem('last_yt_id');
                         const savedTime = localStorage.getItem('last_yt_time');
 
@@ -828,6 +812,13 @@
                         startProgressLoop();
                     },
                     'onStateChange': (event) => {
+                        if (event.data === YT.PlayerState.PLAYING) {
+                            updateQualityMenu();
+                            playStateIcon.textContent = '';
+                        } else {
+                            playStateIcon.textContent = '';
+                        }
+
                         if (event.data === YT.PlayerState.ENDED) {
                             nextVideo();
                         }
@@ -836,24 +827,24 @@
             });
         }
 
-        // --- ပြင်ဆင်ချက် ၁ - Copy, Inspect (F12) နှင့် Download ဆွဲခြင်းကို တားဆီးခြင်း ---
+        // Security, Link Protection & Context Prevention
         document.addEventListener('contextmenu', (e) => {
             if (e.target.tagName !== 'INPUT') e.preventDefault();
         });
         document.addEventListener('dragstart', (e) => e.preventDefault());
-        document.addEventListener('selectstart', (e) => {
-            if (e.target.tagName !== 'INPUT') e.preventDefault();
-        });
         document.addEventListener('keydown', (e) => {
             if (
                 e.key === 'F12' || 
-                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) ||
+                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j')) ||
                 (e.ctrlKey && (e.key === 'U' || e.key === 'u' || e.key === 'S' || e.key === 's'))
             ) {
                 e.preventDefault();
             }
         });
 
+        // -------------------------------------------------------------
+        //  3. UI Rendering Engine (Categories Hub)
+        // -------------------------------------------------------------
         function renderCategorizedHub() {
             const container = document.getElementById('learningHubContainer');
             container.innerHTML = '';
@@ -905,7 +896,8 @@
 
             if (item.type === "video") {
                 player.loadVideoById(item.id);
-                showHUD(` ▶ ${item.title}`);
+                showHUD(` ${item.title}`);
+                if (isVoiceOverEnabled) speakText(item.title, 'en-US');
             } else if (item.type === "playlist") {
                 player.loadPlaylist({
                     listType: 'playlist',
@@ -913,10 +905,14 @@
                     index: 0,
                     startSeconds: 0
                 });
-                showHUD(` ▶ Playlist Loaded: ${item.title}`);
+                showHUD(` Playlist Loaded: ${item.title}`);
+                if (isVoiceOverEnabled) speakText("Playlist loaded", 'en-US');
             }
         }
 
+        // -------------------------------------------------------------
+        //  4. Search & Direct Link Logic
+        // -------------------------------------------------------------
         function extractVideoId(url) {
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
             const match = url.match(regExp);
@@ -929,7 +925,7 @@
 
             const extractedId = extractVideoId(query);
             if (extractedId) {
-                const newVid = { id: extractedId, title: "ဗီဒီယို (" + extractedId + ")", duration: "Custom Link" };
+                const newVid = { id: extractedId, title: "ထည့်သွင်းထားသော ဗီဒီယို (" + extractedId + ")", duration: "Custom Link" };
                 playlistData.unshift(newVid);
                 currentVideoIndex = 0;
                 renderPlaylist();
@@ -939,8 +935,9 @@
                 return;
             }
 
-            if (!YOUTUBE_API_KEY || YOUTUBE_API_KEY === "__YOUTUBE_API_KEY__") {
-                showHUD(" YouTube Video Link / ID ကို ထည့်ပါ");
+            if (!YOUTUBE_API_KEY) {
+                showHUD(" API Key လိုအပ်ပါသည်");
+                alert("စာရိုက်၍ ရှာဖွေရန် YOUTUBE_API_KEY တွင် Key ထည့်ပေးပါ။ သို့မဟုတ် YouTube Video Link / ID ကို Paste လုပ်၍ ရှာနိုင်ပါသည်။");
                 return;
             }
 
@@ -968,6 +965,7 @@
             }
         }
 
+        // Dynamic Playlist Functions
         function renderPlaylist() {
             const container = document.getElementById('videoListContainer');
             container.innerHTML = '';
@@ -979,7 +977,7 @@
                     <img class="video-thumb" src="https://img.youtube.com/vi/${vid.id}/mqdefault.jpg">
                     <div class="video-info">
                         <h4>${vid.title}</h4>
-                        <p>${vid.duration}</p>
+                        <p> ကြာချိန် / Channel - ${vid.duration}</p>
                     </div>
                 `;
                 container.appendChild(card);
@@ -992,8 +990,7 @@
             const vid = playlistData[index];
             player.loadVideoById(vid.id);
             renderPlaylist();
-            showHUD(` ▶ ${vid.title}`);
-            if (tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
+            showHUD(` ${vid.title}`);
         }
 
         function nextVideo() {
@@ -1003,6 +1000,7 @@
             } else if (player.nextVideo) {
                 player.nextVideo();
             }
+            showHUD(" နောက်တစ်ပုဒ်");
         }
 
         function prevVideo() {
@@ -1012,8 +1010,12 @@
             } else if (player.previousVideo) {
                 player.previousVideo();
             }
+            showHUD(" ရှေ့တစ်ပုဒ်");
         }
 
+        // -------------------------------------------------------------
+        //  5. Progress Scrubber Bar & Interactive Notebook Sync Loop
+        // -------------------------------------------------------------
         seekInput.addEventListener('input', (e) => {
             isSeeking = true;
             progressFill.style.width = e.target.value + '%';
@@ -1045,6 +1047,8 @@
                         }
                     }
                 }
+
+                // Interactive Classroom Notebook Sync
                 syncScriptWithVideo();
             }, 300);
         }
@@ -1071,6 +1075,7 @@
                     if (isPlayerReady && player.seekTo) {
                         player.seekTo(item.start, true);
                         player.playVideo();
+                        showHUD(`⏱ Jump to ${minutes}:${seconds}`);
                     }
                 };
                 scriptBox.appendChild(line);
@@ -1101,6 +1106,7 @@
             const fullText = originalLessonData.map(item => item.text).join('\n');
             navigator.clipboard.writeText(fullText).then(() => {
                 showHUD("📋 Notes Copied!");
+                alert('✅ မှတ်စု စာသားအကုန်လုံးကို Copy ယူပြီးပါပြီ။');
             });
         }
 
@@ -1118,11 +1124,12 @@
                 ttsBtn.classList.add('active');
                 ttsBtn.textContent = "🔊 Voice: On";
                 showHUD("🔊 Voice Read Aloud: Enabled");
+                speakText("Voice readout enabled", "en-US");
             } else {
                 ttsBtn.classList.remove('active');
                 ttsBtn.textContent = "🔊 Voice: Off";
-                window.speechSynthesis.cancel();
                 showHUD("🔇 Voice Read Aloud: Disabled");
+                window.speechSynthesis.cancel();
             }
         }
 
