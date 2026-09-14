@@ -266,7 +266,7 @@
             border-radius: 6px;
         }
 
-        /* Classroom Whiteboard Section */
+        /* Classroom Whiteboard / Interactive Document Section */
         .whiteboard-card {
             background-color: var(--card-bg, #1e1e1e);
             border-radius: 12px;
@@ -305,6 +305,17 @@
             flex-wrap: wrap;
         }
 
+        .lang-select-box {
+            background: #2a2a2a;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 7px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            outline: none;
+            cursor: pointer;
+        }
+
         .copy-btn {
             background-color: #2e7d32;
             color: white;
@@ -322,6 +333,20 @@
 
         .copy-btn:hover { background-color: #388e3c; }
         .copy-btn:active { opacity: 0.8; }
+
+        .key-btn {
+            background-color: #d84315;
+            color: white;
+            border: none;
+            padding: 7px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
 
         .script-document {
             max-height: 320px;
@@ -367,7 +392,14 @@
             margin-top: 2px;
         }
 
-        /* Advanced YouTube Search Box Section */
+        .loading-text {
+            color: #ffd700;
+            font-style: italic;
+            padding: 15px;
+            text-align: center;
+        }
+
+        /* Search Section UI */
         .search-box-container {
             width: 100%;
             max-width: 800px;
@@ -379,19 +411,18 @@
         .search-input {
             flex: 1;
             background: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             color: #fff;
-            padding: 12px 16px;
+            padding: 10px 14px;
             border-radius: 8px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             outline: none;
             -webkit-user-select: text;
             user-select: text;
         }
 
         .search-input:focus {
-            border-color: #2481cc;
-            box-shadow: 0 0 8px rgba(36, 129, 204, 0.4);
+            border-color: var(--btn-color);
         }
 
         /* Categorized Video / Playlist Hub Section */
@@ -557,6 +588,26 @@
         <p>Bot သင်ခန်းစာများ၊ Signal ဖတ်နည်းများနှင့် အခမဲ့ Trading သင်တန်းများ စုစည်းမှု</p>
     </div>
 
+    <!-- ထည့်သွင်းထားသော ရှင်းလင်းချက် -->
+    <div style="background-color: #1e1e1e; border-left: 4px solid #ff9800; padding: 15px; margin-bottom: 15px; border-radius: 8px; width: 100%; max-width: 800px; font-size: 0.9rem; line-height: 1.6; color: #ddd; text-align: left;">
+        <div style="color: #ff9800; font-weight: bold; margin-bottom: 10px; font-size: 1rem;">⚠️ Website သည် GitHub Pages (overlord182.github.io) တွင် run နေသောကြောင့် ကုဒ်များကို ပြင်ဆင်ရန် သင့်၏ GitHub အကောင့်ထဲသို့ အရင်ဝင်ရပါမည်။</div>
+        
+        <div style="color: #ffffff; margin-bottom: 6px;"><b>၁။ ကုဒ်မပြင်မီ အလွယ်ဆုံး အရင်စမ်းသပ်ရန်</b></div>
+        <ul style="margin-top: 0; margin-bottom: 12px; padding-left: 20px;">
+            <li>သင့် Website မျက်နှာပြင်ပေါ်ရှိ 🔑 Key ခလုတ်ကို နှိပ်ပါ။</li>
+            <li>Google AI Studio သို့သွား၍ API Key အသစ်တစ်ခု Create လုပ်ပြီး ကော်ပီကူးထည့်ပါ။ အဆင်ပြေသွားပါက ကုဒ်ပြင်ရန် မလိုတော့ပါ။</li>
+        </ul>
+        
+        <div style="color: #ffffff; margin-bottom: 6px;"><b>၂။ GitHub ထဲတွင် Source Code တိုက်ရိုက်သွားပြင်ရန်</b></div>
+        <ul style="margin-top: 0; margin-bottom: 0; padding-left: 20px;">
+            <li style="margin-bottom: 4px;"><b>Repository ဖွင့်ပါ:</b> သင့် GitHub အကောင့်ထဲသို့ဝင်ပြီး Overlord ပရောဂျက် တင်ထားသော Repository ကို ဖွင့်ပါ။</li>
+            <li style="margin-bottom: 4px;"><b>ဖိုင်ရှာပါ:</b> Gemini API လှမ်းခေါ်ထားသော index.html (သို့မဟုတ်) .js ဖိုင်ကို ရှာပြီး Edit လုပ်ရန် ခဲတံပုံ (Edit this file) ကို နှိပ်ပါ။</li>
+            <li style="margin-bottom: 4px;"><b>စာသားပြင်ပါ:</b> ကုဒ်ထဲတွင် <span style="background-color: rgba(255,255,255,0.1); padding: 2px 5px; border-radius: 4px; font-family: monospace;">https://generativelanguage.googleapis.com/v1/</span>... ဟု ရေးထားသော လင့်ခ်ကိုရှာပြီး v1 အစား v1beta ဟု ပြောင်းရေးပါ။ (အကယ်၍ Google SDK သုံးထားပါက Model နာမည်ကို gemini-1.5-flash ဟု ပြင်ပါ)။</li>
+            <li style="margin-bottom: 4px;"><b>Save လုပ်ပါ:</b> ပြင်ဆင်ပြီးပါက ညာဘက်အပေါ်ထောင့်ရှိ Commit changes ကို နှိပ်ပြီး သိမ်းပါ။</li>
+            <li><b>စောင့်ပါ:</b> GitHub Pages အပြောင်းအလဲဖြစ်ရန် ၂ မိနစ်ခန့် စောင့်ပြီး Website ကို Refresh ပြန်လုပ်ကြည့်ပါ။</li>
+        </ul>
+    </div>
+
     <!-- Video Player Container -->
     <div class="video-container" id="videoBox">
         <div class="full-shield-overlay" id="gestureOverlay"></div>
@@ -589,6 +640,9 @@
             <option value="off">💬 CC: ပိတ်မည်</option>
             <option value="my">💬 မြန်မာစာတန်းထိုး</option>
             <option value="en">💬 English Subtitle</option>
+            <option value="th">💬 ไทย Subtitle</option>
+            <option value="ja">💬 日本語 Subtitle</option>
+            <option value="ko">💬 한국어 Subtitle</option>
         </select>
 
         <button class="btn-control" id="ttsBtn" onclick="toggleVoiceOver()">🔊 Voice: Off</button>
@@ -608,20 +662,32 @@
         <span class="time-text" id="timeDisplay">00:00 / 00:00</span>
     </div>
 
-    <!-- Classroom Whiteboard Section -->
+    <!-- Classroom Whiteboard / Interactive Document Section -->
     <div class="whiteboard-card">
         <div class="board-header">
-            <div class="board-title">📖 သင်ခန်းစာ မှတ်စုအပြည့်အစုံ (Interactive Notebook)</div>
+            <div class="board-title">📖 သင်ခန်းစာ ဘာသာပြန် မှတ်စုအပြည့်အစုံ (Interactive Notebook)</div>
             <div class="board-actions">
+                <select class="lang-select-box" id="langSelect" onchange="changeLanguage(this.value)">
+                    <option value="Myanmar" selected>🇲🇲 မြန်မာ (Myanmar)</option>
+                    <option value="English">🇬🇧 အင်္ဂလိပ် (English)</option>
+                    <option value="Thai">🇹🇭 ထိုင်း (Thai)</option>
+                    <option value="Japanese">🇯🇵 ဂျပန် (Japanese)</option>
+                    <option value="Chinese">🇨🇳 တရုတ် (Chinese)</option>
+                </select>
                 <button class="copy-btn" onclick="copyFullNotes()">📋 Copy Notes</button>
+                <button class="key-btn" onclick="configureUserApiKey()">🔑 Key</button>
             </div>
         </div>
-        <div class="script-document" id="scriptBox"></div>
+
+        <!-- Full Document Script Container -->
+        <div class="script-document" id="scriptBox">
+            <!-- Script lines dynamically inserted here -->
+        </div>
     </div>
 
-    <!-- Interactive YouTube Search Bar Section -->
+    <!-- YouTube Search Bar Section -->
     <div class="search-box-container">
-        <input type="text" id="searchInput" class="search-input" placeholder="YouTube Link, Video ID (သို့) စာသားရိုက်၍ ရှာပါ..." oninput="liveFilterLocal()" onkeydown="if(event.key==='Enter') performSearch()">
+        <input type="text" id="searchInput" class="search-input" placeholder="YouTube Link (သို့) ဗီဒီယိုခေါင်းစဉ် ရှာရန်..." onkeydown="if(event.key==='Enter') performSearch()">
         <button class="btn-control" onclick="performSearch()">🔍 ရှာမည်</button>
     </div>
 
@@ -639,8 +705,19 @@
         tg.ready();
         tg.expand();
 
-        // YouTube Data API Key (ထည့်သွင်းထားပါက YouTube တွင် စာသားဖြင့် ရှာဖွေနိုင်ပါမည်)
-        const YOUTUBE_API_KEY = "";
+        // -------------------------------------------------------------
+        // 🔑 Pipeline Configs (Central DB, Scraper Proxy, Developer & User Keys)
+        // -------------------------------------------------------------
+        // index.html ထဲတွင် အောက်ပါအတိုင်း ပြောင်းရေးပါ
+        const YOUTUBE_API_KEY = "__YOUTUBE_API_KEY__";
+        const CENTRAL_GEMINI_API_KEY = "__GEMINI_API_KEY__";
+        
+        let USER_GEMINI_API_KEY = localStorage.getItem('user_gemini_api_key') || ""; // BYOK (Fallback Key)
+        
+        // Central DB & Scraper Proxy Endpoints (အကယ်၍ Backend Server ချိတ်ဆက်ပါက ထည့်ရန်)
+        const CENTRAL_DB_ENDPOINT = "";  // e.g. "https://your-api.com/subtitles"
+        const SCRAPER_PROXY_ENDPOINT = ""; // e.g. "https://your-api.com/transcript-scrape"
+
         const PLAYLIST_ID = "PLATyixI4j2D8"; 
         const CHANNEL_ID = "UCSyM27DAnWU9Yd60eqCPufg"; 
 
@@ -659,30 +736,64 @@
         const timeDisplay = document.getElementById('timeDisplay');
         const searchInput = document.getElementById('searchInput');
 
-        // Course Data Structure
+        // -------------------------------------------------------------
+        // 📚 1. Course Data Structure (Categories, Unlisted Videos & Playlists)
+        // -------------------------------------------------------------
         const courseData = [
             {
                 category: "🤖 Overlord Bot တရားဝင် သင်ခန်းစာများ (Private Course)",
                 items: [
-                    { type: "video", id: "M7lc1UVf-VE", title: "၁။ Overlord Bot အခြေခံ အသုံးပြုနည်း", tag: "Private Course", badgeClass: "badge-course" },
-                    { type: "video", id: "L_LUpnjgPso", title: "၂။ Signal များဖတ်ပြီး Trade ဝင်နည်း", tag: "Private Course", badgeClass: "badge-course" },
-                    { type: "video", id: "fJ9rUzIMcZQ", title: "၃။ Risk Management နှင့် Stop Loss ပြင်ဆင်နည်း", tag: "Private Course", badgeClass: "badge-course" }
+                    { 
+                        type: "video", 
+                        id: "M7lc1UVf-VE", 
+                        title: "၁။ Overlord Bot အခြေခံ အသုံးပြုနည်း", 
+                        tag: "Private Course", 
+                        badgeClass: "badge-course" 
+                    },
+                    { 
+                        type: "video", 
+                        id: "L_LUpnjgPso", 
+                        title: "၂။ Signal များဖတ်ပြီး Trade ဝင်နည်း", 
+                        tag: "Private Course", 
+                        badgeClass: "badge-course" 
+                    },
+                    { 
+                        type: "video", 
+                        id: "fJ9rUzIMcZQ", 
+                        title: "၃။ Risk Management နှင့် Stop Loss ပြင်ဆင်နည်း", 
+                        tag: "Private Course", 
+                        badgeClass: "badge-course" 
+                    }
                 ]
             },
             {
                 category: "📊 Technical Analysis & Full Courses (External Playlists)",
                 items: [
-                    { type: "playlist", id: "PLrAXtmErZgOdP_8G_RyeyC3I", thumbVideoId: "M7lc1UVf-VE", title: "Technical Analysis အခမဲ့ Full Course (Playlist)", tag: "📺 Full Playlist", badgeClass: "badge-playlist" }
+                    { 
+                        type: "playlist", 
+                        id: "PLrAXtmErZgOdP_8G_RyeyC3I", 
+                        thumbVideoId: "M7lc1UVf-VE", 
+                        title: "Technical Analysis အခမဲ့ Full Course (Playlist)", 
+                        tag: "📺 Full Playlist", 
+                        badgeClass: "badge-playlist" 
+                    }
                 ]
             },
             {
                 category: "💡 Trading Psychology & Free Basics (Individual Videos)",
                 items: [
-                    { type: "video", id: "M7lc1UVf-VE", title: "Candlestick Pattern အခြေခံ ဖတ်နည်း", tag: "Free YouTube", badgeClass: "badge-free" }
+                    { 
+                        type: "video", 
+                        id: "M7lc1UVf-VE", 
+                        title: "Candlestick Pattern အခြေခံ ဖတ်နည်း", 
+                        tag: "Free YouTube", 
+                        badgeClass: "badge-free" 
+                    }
                 ]
             }
         ];
 
+        // Dynamic RSS/Search Queue Data
         let playlistData = [
             { id: "M7lc1UVf-VE", title: "၁။ Overlord Bot အခြေခံ အသုံးပြုနည်း", duration: "05:20" },
             { id: "L_LUpnjgPso", title: "၂။ Signal များဖတ်ပြီး Trade ဝင်နည်း", duration: "08:15" },
@@ -695,6 +806,9 @@
         let currentVideoIndex = 0;
         let isSeeking = false;
 
+        // -------------------------------------------------------------
+        // 📖 Lesson Transcript Data & Multi-language Cache Structure
+        // -------------------------------------------------------------
         const originalLessonData = [
             { start: 0, duration: 4, text: "မင်္ဂလာပါ၊ ဒီနေ့ သင်ခန်းစာမှာတော့ Overlord Bot နှင့် Trading အခြေခံကို လေ့လာသွားပါမယ်။" },
             { start: 4, duration: 5, text: "ပထမဆုံးအနေနဲ့ Bot ရဲ့ Signal ဖတ်နည်းနဲ့ Order ဝင်နည်းကို စတင် ရှင်းပြပေးပါမယ်။" },
@@ -704,7 +818,15 @@
         ];
 
         let activeLineIndex = -1;
+        
+        // Multi-level Cache (Video ID -> Language -> Script Array)
+        const translationCache = {
+            "M7lc1UVf-VE": {
+                "Myanmar": originalLessonData
+            }
+        };
 
+        // API Key မလိုဘဲ RSS Feed မှတစ်ဆင့် Playlist/Channel ဗီဒီယိုများ ဆွဲယူခြင်း
         async function fetchVideosFromRSS() {
             let rssUrl = "";
             if (PLAYLIST_ID && PLAYLIST_ID.length > 5) {
@@ -712,6 +834,7 @@
             } else if (CHANNEL_ID) {
                 rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL_ID}`;
             }
+
             if (!rssUrl) return;
 
             try {
@@ -721,7 +844,13 @@
 
                 if (data.items && data.items.length > 0) {
                     playlistData = data.items.map((item, idx) => {
-                        let videoId = item.link.includes('v=') ? item.link.split('v=')[1].split('&')[0] : item.guid.replace('yt:video:', '');
+                        let videoId = "";
+                        if (item.link.includes('v=')) {
+                            videoId = item.link.split('v=')[1].split('&')[0];
+                        } else {
+                            videoId = item.guid.replace('yt:video:', '');
+                        }
+
                         return {
                             id: videoId,
                             title: `${idx + 1}။ ${item.title}`,
@@ -730,12 +859,20 @@
                     }).filter(v => v.id);
 
                     renderPlaylist();
+
+                    const savedVideoId = localStorage.getItem('last_yt_id');
+                    if (isPlayerReady && !savedVideoId && playlistData.length > 0) {
+                        playVideoAtIndex(0);
+                    }
                 }
             } catch (err) {
                 console.error("RSS Fetch Error:", err);
             }
         }
 
+        // -------------------------------------------------------------
+        // 🎬 2. YouTube iFrame API Init & Player Events
+        // -------------------------------------------------------------
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('ytPlayer', {
                 events: {
@@ -746,8 +883,10 @@
                         renderPlaylist();
                         renderScriptDocument(originalLessonData);
 
+                        // Resume position & Video from LocalStorage
                         const savedVideoId = localStorage.getItem('last_yt_id');
                         const savedTime = localStorage.getItem('last_yt_time');
+
                         if (savedVideoId) {
                             const idx = playlistData.findIndex(v => v.id === savedVideoId);
                             if (idx !== -1) currentVideoIndex = idx;
@@ -764,115 +903,37 @@
                         } else {
                             playStateIcon.textContent = '▶';
                         }
-                        if (event.data === YT.PlayerState.ENDED) nextVideo();
+
+                        if (event.data === YT.PlayerState.ENDED) {
+                            nextVideo();
+                        }
                     }
                 }
             });
         }
 
+        // Security, Link Protection & Context Prevention
+        document.addEventListener('contextmenu', (e) => {
+            if (e.target.tagName !== 'INPUT') e.preventDefault();
+        });
+        document.addEventListener('dragstart', (e) => e.preventDefault());
+        document.addEventListener('keydown', (e) => {
+            if (
+                e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j')) ||
+                (e.ctrlKey && (e.key === 'U' || e.key === 'u' || e.key === 'S' || e.key === 's'))
+            ) {
+                e.preventDefault();
+            }
+        });
+
         // -------------------------------------------------------------
-        // 🔍 FULL YOUTUBE SEARCH & LIVE FILTER ENGINE
+        // 🛠️ 3. UI Rendering Engine (Categories Hub)
         // -------------------------------------------------------------
-        function extractVideoId(url) {
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-            const match = url.match(regExp);
-            return (match && match[2].length === 11) ? match[2] : (url.length === 11 ? url : null);
-        }
-
-        // Live Search Filter Across Loaded Courses & Playlists
-        function liveFilterLocal() {
-            const query = searchInput.value.trim().toLowerCase();
-            if (!query) {
-                renderCategorizedHub();
-                renderPlaylist();
-                return;
-            }
-
-            // Filter Playlist Queue
-            const filteredPlaylist = playlistData.filter(item => item.title.toLowerCase().includes(query));
-            renderCustomPlaylist(filteredPlaylist);
-        }
-
-        function renderCustomPlaylist(list) {
-            const container = document.getElementById('videoListContainer');
-            container.innerHTML = '';
-            if (list.length === 0) {
-                container.innerHTML = '<div style="color:#aaa; padding:10px; font-size:0.85rem;">ရှာဖွေမှုနှင့် ကိုက်ညီသော ဗီဒီယို မရှိပါ။</div>';
-                return;
-            }
-
-            list.forEach((vid, index) => {
-                const card = document.createElement('div');
-                card.className = `video-card ${vid.id === (playlistData[currentVideoIndex]?.id) ? 'active' : ''}`;
-                card.onclick = () => {
-                    const originalIdx = playlistData.findIndex(p => p.id === vid.id);
-                    if (originalIdx !== -1) playVideoAtIndex(originalIdx);
-                    else {
-                        player.loadVideoById(vid.id);
-                        showHUD(`▶ ${vid.title}`);
-                    }
-                };
-                card.innerHTML = `
-                    <img class="video-thumb" src="https://img.youtube.com/vi/${vid.id}/mqdefault.jpg">
-                    <div class="video-info">
-                        <h4>${vid.title}</h4>
-                        <p>⏱ ကြာချိန် / Channel - ${vid.duration}</p>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        async function performSearch() {
-            const query = searchInput.value.trim();
-            if (!query) return;
-
-            // 1. Direct YouTube URL or Video ID Match
-            const extractedId = extractVideoId(query);
-            if (extractedId) {
-                const newVid = { id: extractedId, title: "ထည့်သွင်းထားသော ဗီဒီယို (" + extractedId + ")", duration: "Direct Link" };
-                playlistData.unshift(newVid);
-                currentVideoIndex = 0;
-                renderPlaylist();
-                playVideoAtIndex(0);
-                showHUD("▶ YouTube Link ဖြင့် ဖွင့်နေပါသည်");
-                searchInput.value = '';
-                return;
-            }
-
-            // 2. YouTube Data API Search (If Key is Provided)
-            if (YOUTUBE_API_KEY) {
-                try {
-                    showHUD("🔍 YouTube တွင် ရှာဖွေနေပါသည်...");
-                    const response = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${encodeURIComponent(query)}&type=video&key=${YOUTUBE_API_KEY}`);
-                    const data = await response.json();
-
-                    if (data.items && data.items.length > 0) {
-                        playlistData = data.items.map(item => ({
-                            id: item.id.videoId,
-                            title: item.snippet.title,
-                            duration: item.snippet.channelTitle
-                        }));
-                        currentVideoIndex = 0;
-                        document.getElementById('playlistTitleHeader').textContent = `🔍 ရှာဖွေတွေ့ရှိသည့် ဗီဒီယိုများ (${query})`;
-                        renderPlaylist();
-                        playVideoAtIndex(0);
-                        showHUD("✅ ဗီဒီယိုများ တွေ့ရှိပါသည်");
-                        return;
-                    }
-                } catch (err) {
-                    showHUD("❌ API Search Error");
-                }
-            }
-
-            // 3. Fallback: Local Search Result
-            liveFilterLocal();
-            showHUD(`🔍 "${query}" အား ရှာဖွေထားသည်`);
-        }
-
         function renderCategorizedHub() {
             const container = document.getElementById('learningHubContainer');
             container.innerHTML = '';
+
             courseData.forEach((section) => {
                 const header = document.createElement('div');
                 header.className = 'category-header';
@@ -887,7 +948,13 @@
                     card.className = 'item-card';
                     card.onclick = () => playItem(item, card);
 
-                    let thumbUrl = item.type === "video" ? `https://img.youtube.com/vi/${item.id}/mqdefault.jpg` : `https://img.youtube.com/vi/${item.thumbVideoId || "M7lc1UVf-VE"}/mqdefault.jpg`;
+                    let thumbUrl = "";
+                    if (item.type === "video") {
+                        thumbUrl = `https://img.youtube.com/vi/${item.id}/mqdefault.jpg`;
+                    } else if (item.type === "playlist") {
+                        const coverId = item.thumbVideoId || "M7lc1UVf-VE";
+                        thumbUrl = `https://img.youtube.com/vi/${coverId}/mqdefault.jpg`;
+                    }
 
                     card.innerHTML = `
                         <div class="item-thumb-wrapper">
@@ -901,12 +968,14 @@
                     `;
                     cardList.appendChild(card);
                 });
+
                 container.appendChild(cardList);
             });
         }
 
         function playItem(item, cardElement) {
             if (!isPlayerReady) return;
+
             document.querySelectorAll('.item-card').forEach(c => c.classList.remove('active'));
             if (cardElement) cardElement.classList.add('active');
 
@@ -915,18 +984,93 @@
                 showHUD(`▶ ${item.title}`);
                 if (isVoiceOverEnabled) speakText(item.title, 'en-US');
             } else if (item.type === "playlist") {
-                player.loadPlaylist({ listType: 'playlist', list: item.id, index: 0, startSeconds: 0 });
+                player.loadPlaylist({
+                    listType: 'playlist',
+                    list: item.id,
+                    index: 0,
+                    startSeconds: 0
+                });
                 showHUD(`📺 Playlist Loaded: ${item.title}`);
                 if (isVoiceOverEnabled) speakText("Playlist loaded", 'en-US');
             }
         }
 
+        // -------------------------------------------------------------
+        // 🔍 4. Search & Direct Link Logic
+        // -------------------------------------------------------------
+        function extractVideoId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : (url.length === 11 ? url : null);
+        }
+
+        async function performSearch() {
+            const query = searchInput.value.trim();
+            if (!query) return;
+
+            const extractedId = extractVideoId(query);
+            if (extractedId) {
+                const newVid = { id: extractedId, title: "ထည့်သွင်းထားသော ဗီဒီယို (" + extractedId + ")", duration: "Custom Link" };
+                playlistData.unshift(newVid);
+                currentVideoIndex = 0;
+                renderPlaylist();
+                playVideoAtIndex(0);
+                showHUD("▶ ဗီဒီယိုသစ် ဖွင့်နေပါသည်");
+                searchInput.value = '';
+                return;
+            }
+
+            if (!YOUTUBE_API_KEY) {
+                showHUD("⚠️ API Key လိုအပ်ပါသည်");
+                alert("စာရိုက်၍ ရှာဖွေရန် YOUTUBE_API_KEY တွင် Key ထည့်ပေးပါ။ သို့မဟုတ် YouTube Video Link / ID ကို Paste လုပ်၍ ရှာနိုင်ပါသည်။");
+                return;
+            }
+
+            try {
+                showHUD("🔍 ရှာဖွေနေပါသည်...");
+                const response = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=8&q=${encodeURIComponent(query)}&type=video&key=${YOUTUBE_API_KEY}`);
+                const data = await response.json();
+
+                if (data.items && data.items.length > 0) {
+                    playlistData = data.items.map(item => ({
+                        id: item.id.videoId,
+                        title: item.snippet.title,
+                        duration: item.snippet.channelTitle
+                    }));
+                    currentVideoIndex = 0;
+                    document.getElementById('playlistTitleHeader').textContent = `🔍 ရှာဖွေတွေ့ရှိသည့် ဗီဒီယိုများ (${query})`;
+                    renderPlaylist();
+                    playVideoAtIndex(0);
+                    showHUD("✅ ဗီဒီယိုများ တွေ့ရှိပါသည်");
+                } else {
+                    showHUD("❌ ဗီဒီယို မတွေ့ပါ");
+                }
+            } catch (err) {
+                showHUD("❌ Search Error");
+            }
+        }
+
+        // Dynamic Playlist Functions
         function renderPlaylist() {
-            renderCustomPlaylist(playlistData);
+            const container = document.getElementById('videoListContainer');
+            container.innerHTML = '';
+            playlistData.forEach((vid, index) => {
+                const card = document.createElement('div');
+                card.className = `video-card ${index === currentVideoIndex ? 'active' : ''}`;
+                card.onclick = () => playVideoAtIndex(index);
+                card.innerHTML = `
+                    <img class="video-thumb" src="https://img.youtube.com/vi/${vid.id}/mqdefault.jpg">
+                    <div class="video-info">
+                        <h4>${vid.title}</h4>
+                        <p>⏱ ကြာချိန် / Channel - ${vid.duration}</p>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
         }
 
         function playVideoAtIndex(index) {
-            if (!isPlayerReady || !playlistData[index]) return;
+            if (!isPlayerReady) return;
             currentVideoIndex = index;
             const vid = playlistData[index];
             player.loadVideoById(vid.id);
@@ -936,19 +1080,27 @@
 
         function nextVideo() {
             if (!isPlayerReady) return;
-            if (currentVideoIndex < playlistData.length - 1) playVideoAtIndex(currentVideoIndex + 1);
-            else if (player.nextVideo) player.nextVideo();
+            if (currentVideoIndex < playlistData.length - 1) {
+                playVideoAtIndex(currentVideoIndex + 1);
+            } else if (player.nextVideo) {
+                player.nextVideo();
+            }
             showHUD("⏭ နောက်တစ်ပုဒ်");
         }
 
         function prevVideo() {
             if (!isPlayerReady) return;
-            if (currentVideoIndex > 0) playVideoAtIndex(currentVideoIndex - 1);
-            else if (player.previousVideo) player.previousVideo();
+            if (currentVideoIndex > 0) {
+                playVideoAtIndex(currentVideoIndex - 1);
+            } else if (player.previousVideo) {
+                player.previousVideo();
+            }
             showHUD("⏮ ရှေ့တစ်ပုဒ်");
         }
 
-        // Timeline Scrubber & Notebook Sync
+        // -------------------------------------------------------------
+        // ⏱️ 5. Progress Scrubber Bar & Interactive Notebook Sync Loop
+        // -------------------------------------------------------------
         seekInput.addEventListener('input', (e) => {
             isSeeking = true;
             progressFill.style.width = e.target.value + '%';
@@ -957,7 +1109,8 @@
         seekInput.addEventListener('change', (e) => {
             if (isPlayerReady) {
                 const duration = player.getDuration();
-                player.seekTo((e.target.value / 100) * duration, true);
+                const seekToSec = (e.target.value / 100) * duration;
+                player.seekTo(seekToSec, true);
             }
             isSeeking = false;
         });
@@ -972,12 +1125,15 @@
                         progressFill.style.width = pct + '%';
                         seekInput.value = pct;
                         timeDisplay.textContent = `${formatTime(current)} / ${formatTime(duration)}`;
+                        
                         if (playlistData[currentVideoIndex]) {
                             localStorage.setItem('last_yt_id', playlistData[currentVideoIndex].id);
                             localStorage.setItem('last_yt_time', current);
                         }
                     }
                 }
+
+                // Interactive Classroom Notebook Sync
                 syncScriptWithVideo();
             }, 300);
         }
@@ -989,17 +1145,40 @@
             return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
         }
 
+        // -------------------------------------------------------------
+        // 📖 6. 4-Tier Fallback Pipeline (Interactive Notebook & Subtitle Engine)
+        // -------------------------------------------------------------
+        function getCurrentVideoId() {
+            if (playlistData[currentVideoIndex]) {
+                return playlistData[currentVideoIndex].id;
+            }
+            return "M7lc1UVf-VE";
+        }
+
+        function configureUserApiKey() {
+            const userKey = prompt("သင့်၏ ကိုယ်ပိုင် Gemini Free API Key ကို ထည့်သွင်းပါ (Central Key Limit ပြည့်ပါက ဤ Key ကို အသုံးပြုပါမည်):", USER_GEMINI_API_KEY);
+            if (userKey !== null) {
+                USER_GEMINI_API_KEY = userKey.trim();
+                localStorage.setItem('user_gemini_api_key', USER_GEMINI_API_KEY);
+                showHUD(USER_GEMINI_API_KEY ? "🔑 Custom Key Saved" : "🔑 Custom Key Cleared");
+            }
+        }
+
         function renderScriptDocument(data) {
             const scriptBox = document.getElementById('scriptBox');
             if (!scriptBox) return;
             scriptBox.innerHTML = '';
+
             data.forEach((item, index) => {
                 const line = document.createElement('div');
                 line.className = 'script-line';
                 line.id = `line-${index}`;
+                
                 const minutes = Math.floor(item.start / 60);
                 const seconds = Math.floor(item.start % 60).toString().padStart(2, '0');
+
                 line.innerHTML = `<span class="timestamp-badge">${minutes}:${seconds}</span> <span>${item.text}</span>`;
+
                 line.onclick = () => {
                     if (isPlayerReady && player.seekTo) {
                         player.seekTo(item.start, true);
@@ -1007,37 +1186,201 @@
                         showHUD(`⏱ Jump to ${minutes}:${seconds}`);
                     }
                 };
+
                 scriptBox.appendChild(line);
             });
         }
 
+        function getCurrentScriptData() {
+            const videoId = getCurrentVideoId();
+            const currentLang = document.getElementById('langSelect')?.value || "Myanmar";
+            if (translationCache[videoId] && translationCache[videoId][currentLang]) {
+                return translationCache[videoId][currentLang];
+            }
+            return originalLessonData;
+        }
+
         function syncScriptWithVideo() {
             if (!isPlayerReady || !player || typeof player.getCurrentTime !== 'function') return;
+
+            const currentData = getCurrentScriptData();
             const currentTime = player.getCurrentTime();
-            const currentIndex = originalLessonData.findIndex(item => currentTime >= item.start && currentTime < (item.start + (item.duration || 5)));
+
+            const currentIndex = currentData.findIndex(item => 
+                currentTime >= item.start && currentTime < (item.start + (item.duration || 5))
+            );
+
             if (currentIndex !== -1 && currentIndex !== activeLineIndex) {
                 if (activeLineIndex !== -1) {
                     const prevLine = document.getElementById(`line-${activeLineIndex}`);
                     if (prevLine) prevLine.classList.remove('active');
                 }
+
                 const currentLine = document.getElementById(`line-${currentIndex}`);
                 if (currentLine) {
                     currentLine.classList.add('active');
                     currentLine.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 }
+
                 activeLineIndex = currentIndex;
             }
         }
 
+        // Master Fallback Pipeline Handler
+        async function changeLanguage(selectedLang) {
+            const scriptBox = document.getElementById('scriptBox');
+            if (!scriptBox) return;
+
+            const videoId = getCurrentVideoId();
+
+            // ---------------------------------------------------------
+            // STEP 1: Central Database / Local Cache Check (0 API Call)
+            // ---------------------------------------------------------
+            if (translationCache[videoId] && translationCache[videoId][selectedLang]) {
+                renderScriptDocument(translationCache[videoId][selectedLang]);
+                showHUD(`⚡ Loaded from Cache: ${selectedLang}`);
+                return;
+            }
+
+            if (CENTRAL_DB_ENDPOINT) {
+                try {
+                    const dbRes = await fetch(`${CENTRAL_DB_ENDPOINT}?videoId=${videoId}&lang=${selectedLang}`);
+                    if (dbRes.ok) {
+                        const dbData = await dbRes.json();
+                        if (dbData && dbData.length > 0) {
+                            if (!translationCache[videoId]) translationCache[videoId] = {};
+                            translationCache[videoId][selectedLang] = dbData;
+                            renderScriptDocument(dbData);
+                            showHUD(`🗄️ Loaded from DB: ${selectedLang}`);
+                            return;
+                        }
+                    }
+                } catch (e) {
+                    console.log("Central DB Check Skipped/Offline");
+                }
+            }
+
+            scriptBox.innerHTML = `<div class="loading-text">⏳ ${selectedLang} ဘာသာစကားအတွက် စာတန်းထိုး ရယူနေပါသည်။ ခဏစောင့်ပါ...</div>`;
+
+            // ---------------------------------------------------------
+            // STEP 2: Direct Scrape via YouTube Subtitle Scraper API
+            // ---------------------------------------------------------
+            if (SCRAPER_PROXY_ENDPOINT) {
+                try {
+                    const scrapeRes = await fetch(`${SCRAPER_PROXY_ENDPOINT}?videoId=${videoId}&lang=${selectedLang}`);
+                    if (scrapeRes.ok) {
+                        const scrapedData = await scrapeRes.json();
+                        if (scrapedData && scrapedData.length > 0) {
+                            saveToCacheAndDB(videoId, selectedLang, scrapedData);
+                            renderScriptDocument(scrapedData);
+                            showHUD(`🎯 Scraped Subtitle: ${selectedLang}`);
+                            return;
+                        }
+                    }
+                } catch (e) {
+                    console.log("Scraper Skipped or No Captions on YouTube");
+                }
+            }
+
+            // ---------------------------------------------------------
+            // STEP 3: Central Developer Gemini 1.5 Flash Free API Key
+            // ---------------------------------------------------------
+            const baseScript = (translationCache[videoId] && translationCache[videoId]["Myanmar"]) ? 
+                                translationCache[videoId]["Myanmar"] : originalLessonData;
+
+            if (CENTRAL_GEMINI_API_KEY) {
+                try {
+                    showHUD(`🤖 Generating via Central AI...`);
+                    const translatedData = await translateWithGeminiAPI(baseScript, selectedLang, CENTRAL_GEMINI_API_KEY);
+                    saveToCacheAndDB(videoId, selectedLang, translatedData);
+                    renderScriptDocument(translatedData);
+                    showHUD(`✅ AI Generated (${selectedLang})`);
+                    return;
+                } catch (error) {
+                    console.warn("Central Gemini API Limit/Error:", error.message);
+                    // Central Key Failure -> Fallback to Step 4
+                }
+            }
+
+            // ---------------------------------------------------------
+            // STEP 4: Fallback to User BYOK Gemini Key
+            // ---------------------------------------------------------
+            if (USER_GEMINI_API_KEY) {
+                try {
+                    showHUD(`🔑 Falling back to User Key...`);
+                    const translatedData = await translateWithGeminiAPI(baseScript, selectedLang, USER_GEMINI_API_KEY);
+                    saveToCacheAndDB(videoId, selectedLang, translatedData);
+                    renderScriptDocument(translatedData);
+                    showHUD(`✅ Generated with User Key`);
+                    return;
+                } catch (error) {
+                    scriptBox.innerHTML = `<div style="color:#ff4d4d; padding:10px; text-align:center;">❌ User API Key အမှားအယွင်းရှိပါသည်: ${error.message}</div>`;
+                    return;
+                }
+            }
+
+            // If all 4 steps fail or keys are missing:
+            scriptBox.innerHTML = `
+                <div style="color:#ffd700; padding:12px; text-align:center; font-size:0.88rem;">
+                    ⚠️ Central Key Limit ပြည့်သွားပါပြီ။ လူကြီးမင်း၏ ကိုယ်ပိုင် Gemini API Key ကို အပေါ်မှ <b>[🔑 Key]</b> ခလုတ်တွင် ထည့်သွင်းပေးပါရန်။
+                </div>`;
+            showHUD("⚠️ Key Required");
+        }
+
+        // Gemini API Translation Fetcher (Fix Error: model name and API version)
+        async function translateWithGeminiAPI(data, targetLang, apiKey) {
+            const prompt = `You are an expert translator for trading and educational videos. Translate the 'text' field of this JSON array into ${targetLang} language naturally and accurately. Keep 'start' and 'duration' values exact and unchanged. Output ONLY raw JSON array without markdown syntax: ${JSON.stringify(data)}`;
+
+            // Endpoint ကို v1beta အစား v1 သို့မဟုတ် gemini-1.5-flash အစား gemini-2.5-flash/gemini-1.5-flash-latest သို့ ပြင်ဆင်ထားပါသည်
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }]
+                })
+            });
+
+            if (!response.ok) {
+                const errJson = await response.json().catch(() => ({}));
+                throw new Error(errJson.error?.message || `HTTP Error ${response.status}`);
+            }
+
+            const resData = await response.json();
+            let rawText = resData.candidates[0].content.parts[0].text;
+            rawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+            return JSON.parse(rawText);
+        }
+
+        // Cache Saver Engine
+        function saveToCacheAndDB(videoId, lang, data) {
+            if (!translationCache[videoId]) translationCache[videoId] = {};
+            translationCache[videoId][lang] = data;
+
+            // Optional Central DB Sync (Background save)
+            if (CENTRAL_DB_ENDPOINT) {
+                fetch(CENTRAL_DB_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ videoId, lang, subtitleData: data })
+                }).catch(() => {});
+            }
+        }
+
         function copyFullNotes() {
-            const fullText = originalLessonData.map(item => item.text).join('\n');
+            const currentData = getCurrentScriptData();
+            const fullText = currentData.map(item => item.text).join('\n');
+            
             navigator.clipboard.writeText(fullText).then(() => {
                 showHUD("📋 Notes Copied!");
-                alert('✅ မှတ်စု စာသားအကုန်လုံးကို Copy ယူပြီးပါပြီ။');
+                alert('✅ မှတ်စု စာသားအကုန်လုံးကို Copy ယူပြီးပါပြီ။ Word/Notes ထဲတွင် Paste လုပ်နိုင်ပါပြီ။');
+            }).catch(() => {
+                alert('Copy Error!');
             });
         }
 
-        // Voice TTS & Subtitle Controls
+        // -------------------------------------------------------------
+        // 🗣️ 7. Speech Engine (TTS) & Subtitle / Quality Controls
+        // -------------------------------------------------------------
         function speakText(text, lang = 'en-US') {
             if (!('speechSynthesis' in window) || !isVoiceOverEnabled) return;
             window.speechSynthesis.cancel();
@@ -1070,7 +1413,9 @@
             } else {
                 player.loadModule('captions');
                 player.setOption('captions', 'track', {'languageCode': langCode});
-                showHUD(`💬 Subtitle: ${langCode.toUpperCase()}`);
+                const selectedText = subtitleSelect.options[subtitleSelect.selectedIndex].text;
+                showHUD(`${selectedText}`);
+                if (isVoiceOverEnabled) speakText(`Subtitle changed to ${langCode}`, 'en-US');
             }
         }
 
@@ -1084,7 +1429,7 @@
                     qualities.forEach(q => {
                         const opt = document.createElement('option');
                         opt.value = q;
-                        opt.textContent = `⚙️ ${q}`;
+                        opt.textContent = `⚙️ ${formatQualityName(q)}`;
                         if (q === currentQual) opt.selected = true;
                         qualitySelect.appendChild(opt);
                     });
@@ -1092,13 +1437,20 @@
             } catch(e) {}
         }
 
+        function formatQualityName(q) {
+            const names = {'highres': '4K / 2K', 'hd1080': '1080p (HD)', 'hd720': '720p (HD)', 'large': '480p', 'medium': '360p', 'small': '240p', 'tiny': '144p', 'auto': 'Auto'};
+            return names[q] || q;
+        }
+
         function changeQuality(val) {
             if (!isPlayerReady) return;
             player.setPlaybackQuality(val);
-            showHUD(`⚙️ Quality: ${val}`);
+            showHUD(`⚙️ Quality: ${formatQualityName(val)}`);
         }
 
-        // Touch Gestures System
+        // -------------------------------------------------------------
+        // 👆 8. Touch Gesture Engine (Pinch Zoom, Brightness, Volume, Seek)
+        // -------------------------------------------------------------
         let touchStartX = 0, touchStartY = 0;
         let currentBrightness = 1.0, currentVolume = 100, currentZoom = 1.0;
         let initialPinchDist = 0, lastTapTime = 0, tapTimeout;
@@ -1132,7 +1484,9 @@
                     handleDoubleTap(touchStartX);
                 } else {
                     tapTimeout = setTimeout(() => {
-                        if (!isSeekingGesture && !isVolumeGesture && !isBrightnessGesture) togglePlayPause();
+                        if (!isSeekingGesture && !isVolumeGesture && !isBrightnessGesture) {
+                            togglePlayPause();
+                        }
                     }, 300);
                 }
                 lastTapTime = currentTime;
@@ -1220,6 +1574,9 @@
             }
         }
 
+        // -------------------------------------------------------------
+        // 🖥️ 9. Fullscreen Mode & Telegram Haptics
+        // -------------------------------------------------------------
         function toggleManualFullscreen() {
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
             const isFullscreen = videoBox.classList.contains('custom-fullscreen');
@@ -1236,6 +1593,15 @@
                 if (document.exitFullscreen && document.fullscreenElement) document.exitFullscreen().catch(() => {});
             }
         }
+
+        document.addEventListener("fullscreenchange", () => {
+            if (!document.fullscreenElement) {
+                videoBox.classList.remove('custom-fullscreen');
+                btnText.textContent = "မျက်နှာပြင် အပြည့်ကြည့်မည် (Zoom)";
+                btnIcon.textContent = "⛶";
+            }
+        });
     </script>
 </body>
 </html>
+
