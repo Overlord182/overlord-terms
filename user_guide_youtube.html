@@ -670,7 +670,7 @@
         tg.ready();
         tg.expand();
 
-        const YOUTUBE_API_KEY = "__YOUTUBE_API_KEY__";
+        const YOUTUBE_API_KEY = "__YOUTUBE_API_KEY__"; // မိမိ၏ API Key ထည့်ရန်
         const PLAYLIST_ID = "PLATyixI4j2D8"; 
         const CHANNEL_ID = "UCSyM27DAnWU9Yd60eqCPufg"; 
 
@@ -806,20 +806,17 @@
         // -------------------------------------------------------------
         // 🔍 YouTube Search & Direct Link Logic
         // -------------------------------------------------------------
-
-        // ၁။ ထည့်သွင်းလိုက်သော စာသားသည် YouTube Link (သို့မဟုတ်) Video ID ဟုတ်မဟုတ် စစ်ဆေးခြင်း
         function extractVideoId(url) {
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            if (!url) return null;
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|shorts\/|\&v=)([^#\&\?]*).*/;
             const match = url.match(regExp);
-            return (match && match[2].length === 11) ? match[2] : (url.length === 11 ? url : null);
+            return (match && match[2].length === 11) ? match[2] : (url.trim().length === 11 ? url.trim() : null);
         }
 
-        // ၂။ ရှာဖွေမှုလုပ်ဆောင်ခြင်း (Search Button နှိပ်လိုက်သောအခါ (သို့) Enter ခေါက်သောအခါ)
         async function performSearch() {
             const query = searchInput.value.trim();
             if (!query) return;
 
-            // အကယ်၍ Link သို့မဟုတ် Video ID ဖြစ်နေပါက တိုက်ရိုက်ဖွင့်မည်
             const extractedId = extractVideoId(query);
             if (extractedId) {
                 const newVid = { id: extractedId, title: "ထည့်သွင်းထားသော ဗီဒီယို (" + extractedId + ")", duration: "Custom Link" };
@@ -832,14 +829,12 @@
                 return;
             }
 
-            // API Key ရှိမရှိ စစ်ဆေးခြင်း
             if (!YOUTUBE_API_KEY || YOUTUBE_API_KEY === "__YOUTUBE_API_KEY__") {
                 showHUD("⚠️ API Key လိုအပ်ပါသည်");
                 alert("စာရိုက်၍ ရှာဖွေရန် YOUTUBE_API_KEY တွင် Key ထည့်ပေးပါ။ သို့မဟုတ် YouTube Video Link / ID ကို Paste လုပ်၍ ရှာနိုင်ပါသည်။");
                 return;
             }
 
-            // YouTube Data API v3 ကို အသုံးပြု၍ အင်တာနက်ပေါ်မှ တိုက်ရိုက်ရှာဖွေခြင်း
             try {
                 showHUD("🔍 ရှာဖွေနေပါသည်...");
                 const response = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=8&q=${encodeURIComponent(query)}&type=video&key=${YOUTUBE_API_KEY}`;
