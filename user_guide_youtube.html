@@ -4,1237 +4,641 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="robots" content="noindex, nofollow">
-    <title>Overlord Bot Guide & Dynamic Learning Hub</title>
+    <title>Overlord YouTube Player Hub</title>
 
-    <!-- Telegram WebApp JS SDK -->
+    <!-- Telegram WebApp JS SDK & YouTube API -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- YouTube Iframe API -->
     <script src="https://www.youtube.com/iframe_api"></script>
 
     <style>
         :root {
-            --primary-color: #ff0000;
-            --bg-color: var(--tg-theme-bg-color, #0f0f0f);
-            --card-bg: #1f1f1f;
-            --text-color: var(--tg-theme-text-color, #ffffff);
-            --hint-color: var(--tg-theme-hint-color, #aaaaaa);
-            --btn-color: var(--tg-theme-button-color, #2481cc);
-            --btn-text-color: var(--tg-theme-button-text-color, #ffffff);
-            --badge-course: #ff9800;
-            --badge-playlist: #2196f3;
-            --badge-free: #4caf50;
+            --yt-red: #ff0000;
+            --yt-dark: #0f0f0f;
+            --yt-card: #1f1f1f;
+            --text-main: #ffffff;
+            --text-sub: #aaaaaa;
         }
 
         * {
             box-sizing: border-box;
             -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
             user-select: none;
-            -webkit-touch-callout: none;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            font-family: "Roboto", "Segoe UI", Arial, sans-serif;
+            background-color: var(--yt-dark);
+            color: var(--text-main);
             margin: 0;
-            padding: 15px;
-            min-height: 100vh;
+            padding: 12px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding-top: calc(15px + env(safe-area-inset-top));
-            padding-bottom: calc(15px + env(safe-area-inset-bottom));
         }
 
-        .header-text {
-            text-align: center;
-            margin-bottom: 15px;
-            transition: opacity 0.3s ease;
-            width: 100%;
-            max-width: 800px;
-        }
-
-        .header-text h2 {
-            margin: 0 0 8px 0;
-            font-size: 1.2rem;
-            color: #ffffff;
-        }
-
-        .header-text p {
-            color: var(--hint-color);
-            font-size: 0.85rem;
-            margin: 0;
-            line-height: 1.4;
-        }
-
-        /* Video Container & Touch Gestures UI */
-        .video-container {
+        /* YouTube Player Exact Container */
+        .yt-player-wrapper {
             position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center; 
-            margin: 0 auto; 
-            width: 100%; 
-            max-width: 800px; 
+            width: 100%;
+            max-width: 850px;
             aspect-ratio: 16 / 9;
-            background: #000;
+            background: #000000;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-            transition: all 0.3s ease;
-            touch-action: none;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.7);
         }
 
-        .full-shield-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
+        .yt-player-wrapper iframe {
             width: 100%;
             height: 100%;
-            z-index: 50;
-            background: rgba(0, 0, 0, 0.001);
-            touch-action: none;
-            cursor: pointer;
-        }
-
-        .hud-indicator {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.85);
-            color: #ffffff;
-            padding: 10px 18px;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: bold;
+            border: none;
             pointer-events: none;
-            z-index: 60;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            white-space: nowrap;
         }
 
-        .hud-indicator.show {
+        /* Full Interactive Controls Overlay */
+        .yt-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.4);
             opacity: 1;
+            transition: opacity 0.25s ease;
+            z-index: 10;
         }
 
-        .video-container iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            pointer-events: none;
-            transform-origin: center center;
-            transition: filter 0.1s ease, transform 0.05s ease-out;
-        }
-
-        /* In-Player Scrubber Progress Bar Overlay */
-        .progress-overlay-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: 55;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
-            padding: 8px 12px 6px 12px;
-            display: flex;
-            align-items: center;
-        }
-
-        .progress-bar-container {
-            position: relative;
-            width: 100%;
-            height: 5px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 3px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--primary-color);
-            border-radius: 3px;
-            width: 0%;
-        }
-
-        .seek-input {
-            position: absolute;
-            top: -5px;
-            left: 0;
-            width: 100%;
-            height: 15px;
+        .yt-overlay.hidden {
             opacity: 0;
-            cursor: pointer;
-            z-index: 60;
-            margin: 0;
+            pointer-events: none;
         }
 
-        /* Custom Fullscreen Mode */
-        .video-container.custom-fullscreen {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100vw !important;
-            height: 100vh !important;
-            max-width: 100vw !important;
-            z-index: 999999 !important;
-            border-radius: 0 !important;
-            margin: 0 !important;
-        }
-
-        .video-container.custom-fullscreen iframe {
-            height: 100vh !important;
-            aspect-ratio: auto !important;
-        }
-
-        @media screen and (orientation: landscape) {
-            body {
-                padding: 0;
-                background-color: #000;
-            }
-            .header-text, .controls-bar, .whiteboard-card, .search-box-container, .learning-hub-section, .playlist-section {
-                display: none !important;
-            }
-            .video-container {
-                max-width: 100vw;
-                height: 100vh;
-                border-radius: 0;
-            }
-            .video-container iframe {
-                height: 100vh;
-            }
-        }
-
-        /* Control Panel Bar */
-        .controls-bar {
-            margin-top: 15px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            width: 100%;
-            max-width: 800px;
-            flex-wrap: wrap;
-        }
-
-        .btn-control {
-            background-color: var(--btn-color);
-            color: var(--btn-text-color);
-            border: none;
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            outline: none;
-        }
-
-        select.btn-control {
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            padding-right: 26px;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 6px center;
-            background-size: 16px;
-        }
-
-        .btn-control.active {
-            background-color: #28a745;
-        }
-
-        .btn-control:active {
-            opacity: 0.8;
-        }
-
-        .time-text {
-            font-size: 0.8rem;
-            color: var(--text-color);
-            font-family: monospace;
-            padding: 6px 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 6px;
-        }
-
-        /* Classroom Whiteboard Section */
-        .whiteboard-card {
-            background-color: var(--card-bg, #1e1e1e);
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 16px;
-            margin-top: 18px;
-            width: 100%;
-            max-width: 800px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .board-header {
+        /* Top Header Overlay */
+        .yt-top-bar {
+            padding: 12px 16px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-            gap: 10px;
         }
 
-        .board-title {
-            font-size: 1.02rem;
-            color: #4da6ff;
-            font-weight: bold;
+        .yt-video-title {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 80%;
+        }
+
+        /* Center Big Play Icon */
+        .yt-center-btn {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px; height: 60px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 50%;
             display: flex;
             align-items: center;
-            gap: 6px;
-        }
-
-        .board-actions {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .copy-btn {
-            background-color: #2e7d32;
-            color: white;
-            border: none;
-            padding: 7px 14px;
-            border-radius: 6px;
+            justify-content: center;
             cursor: pointer;
+            border: none;
+            color: #fff;
+            font-size: 1.6rem;
+            transition: transform 0.15s ease, background 0.2s;
+        }
+
+        .yt-center-btn:hover {
+            background: rgba(255, 0, 0, 0.8);
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        /* Ripple Animations for Double Tap (+10s/-10s) */
+        .ripple-indicator {
+            position: absolute;
+            top: 0; bottom: 0;
+            width: 40%;
+            background: rgba(255, 255, 255, 0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             font-size: 0.85rem;
             font-weight: bold;
-            transition: 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 4px;
+            color: #fff;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
         }
 
-        .copy-btn:hover { background-color: #388e3c; }
-        .copy-btn:active { opacity: 0.8; }
+        .ripple-indicator.left { left: 0; border-radius: 0 100% 100% 0 / 0 50% 50% 0; }
+        .ripple-indicator.right { right: 0; border-radius: 100% 0 0 100% / 50% 0 0 50%; }
+        .ripple-indicator.show { opacity: 1; }
 
-        .script-document {
-            max-height: 320px;
-            overflow-y: auto;
-            line-height: 1.7;
-            font-size: 0.95rem;
-            padding-right: 6px;
+        /* Bottom Controls Bar (YouTube Exact Layout) */
+        .yt-bottom-bar {
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 10%, transparent);
+            padding: 0 12px 8px 12px;
             display: flex;
             flex-direction: column;
             gap: 4px;
         }
 
-        .script-line {
-            padding: 8px 10px;
-            border-radius: 6px;
+        /* YouTube Interactive Progress Bar */
+        .yt-progress-container {
+            position: relative;
+            width: 100%;
+            height: 14px;
+            display: flex;
+            align-items: center;
             cursor: pointer;
-            transition: background-color 0.2s, border 0.2s;
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-            word-break: break-word;
         }
 
-        .script-line:hover {
-            background-color: rgba(255, 255, 255, 0.08);
-        }
-
-        .script-line.active {
-            background-color: rgba(255, 215, 0, 0.15);
-            color: #ffd700;
-            border-left: 4px solid #ffd700;
-            font-weight: bold;
-        }
-
-        .timestamp-badge {
-            font-size: 0.75rem;
-            color: #aaa;
-            background: #2a2a2a;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: monospace;
-            flex-shrink: 0;
-            margin-top: 2px;
-        }
-
-        /* Advanced YouTube Search Box Section */
-        .search-box-container {
+        .yt-progress-bg {
+            position: relative;
             width: 100%;
-            max-width: 800px;
-            margin-top: 18px;
-            display: flex;
-            gap: 8px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.3);
+            transition: height 0.1s ease;
         }
 
-        .search-input {
-            flex: 1;
-            background: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        .yt-progress-container:hover .yt-progress-bg {
+            height: 5px;
+        }
+
+        .yt-progress-fill {
+            height: 100%;
+            background: var(--yt-red);
+            width: 0%;
+            position: relative;
+        }
+
+        .yt-progress-scrubber {
+            position: absolute;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%) scale(0);
+            width: 12px;
+            height: 12px;
+            background: var(--yt-red);
+            border-radius: 50%;
+            transition: transform 0.1s ease;
+        }
+
+        .yt-progress-container:hover .yt-progress-scrubber {
+            transform: translateY(-50%) scale(1);
+        }
+
+        .yt-range-input {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 5;
+            margin: 0;
+        }
+
+        /* Control Buttons Group */
+        .yt-controls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .yt-left-controls, .yt-right-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .yt-btn {
+            background: none;
+            border: none;
             color: #fff;
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            outline: none;
-            -webkit-user-select: text;
-            user-select: text;
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.9;
+            transition: opacity 0.15s, transform 0.1s;
         }
 
-        .search-input:focus {
-            border-color: #2481cc;
-            box-shadow: 0 0 8px rgba(36, 129, 204, 0.4);
+        .yt-btn:hover {
+            opacity: 1;
+            transform: scale(1.08);
         }
 
-        /* Categorized Video / Playlist Hub Section */
-        .learning-hub-section {
-            width: 100%;
-            max-width: 800px;
-            margin-top: 20px;
+        .yt-time {
+            font-size: 0.78rem;
+            color: #ddd;
+            font-family: Roboto, Arial, sans-serif;
+            margin-left: 4px;
         }
 
-        .category-header {
-            font-weight: bold;
-            margin: 18px 0 10px 0;
-            color: #ffbc00;
-            font-size: 0.95rem;
+        /* Volume Slider Integration */
+        .volume-group {
             display: flex;
             align-items: center;
             gap: 6px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 6px;
         }
 
-        .item-card-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .item-card {
-            display: flex;
-            gap: 12px;
-            background: var(--card-bg);
-            padding: 10px;
-            border-radius: 8px;
+        .volume-slider {
+            width: 0px;
+            height: 3px;
+            appearance: none;
+            -webkit-appearance: none;
+            background: #fff;
+            outline: none;
+            transition: width 0.2s ease;
             cursor: pointer;
-            transition: background 0.2s, border 0.2s;
-            border-left: 4px solid transparent;
         }
 
-        .item-card:active, .item-card.active {
-            background: #2a2a2a;
-            border-left-color: var(--primary-color);
+        .volume-group:hover .volume-slider {
+            width: 50px;
         }
 
-        .item-thumb-wrapper {
-            position: relative;
-            width: 110px;
-            aspect-ratio: 16 / 9;
-            flex-shrink: 0;
-        }
-
-        .item-thumb {
-            width: 100%;
-            height: 100%;
-            border-radius: 6px;
-            object-fit: cover;
-        }
-
-        .playlist-badge-icon {
+        /* Settings Popover Menu */
+        .settings-menu {
             position: absolute;
-            bottom: 4px;
-            right: 4px;
-            background: rgba(0, 0, 0, 0.8);
-            color: #fff;
-            font-size: 0.65rem;
-            padding: 2px 5px;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-
-        .item-info {
-            display: flex;
+            bottom: 45px;
+            right: 12px;
+            background: rgba(28, 28, 28, 0.95);
+            border-radius: 8px;
+            padding: 8px 0;
+            width: 180px;
+            display: none;
             flex-direction: column;
-            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            z-index: 20;
+            font-size: 0.82rem;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .item-info h4 {
-            margin: 0 0 6px 0;
-            font-size: 0.88rem;
-            color: #ffffff;
-            line-height: 1.3;
+        .settings-menu.show { display: flex; }
+
+        .menu-item {
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            color: #eee;
         }
 
-        .badge-tag {
-            display: inline-block;
-            font-size: 0.7rem;
-            padding: 2px 6px;
-            border-radius: 4px;
-            color: #fff;
-            font-weight: bold;
-            width: fit-content;
-        }
+        .menu-item:hover { background: rgba(255,255,255,0.1); }
 
-        .badge-course { background-color: var(--badge-course); }
-        .badge-playlist { background-color: var(--badge-playlist); }
-        .badge-free { background-color: var(--badge-free); }
-
-        /* Dynamic Playlist Queue Section (Search / RSS) */
-        .playlist-section {
+        /* Search & Playlist Layout */
+        .content-section {
             width: 100%;
-            max-width: 800px;
+            max-width: 850px;
             margin-top: 15px;
         }
 
-        .playlist-title {
-            font-size: 1rem;
-            font-weight: bold;
-            margin-bottom: 12px;
-            color: var(--text-color);
-        }
-
-        .video-list {
+        .search-box {
             display: flex;
-            flex-direction: column;
-            gap: 10px;
+            gap: 8px;
+            margin-bottom: 15px;
         }
 
-        .video-card {
+        .search-box input {
+            flex: 1;
+            background: var(--yt-card);
+            border: 1px solid #333;
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        .search-box button {
+            background: #333;
+            color: #fff;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .playlist-card {
             display: flex;
             gap: 12px;
-            background: var(--card-bg);
-            padding: 10px;
+            background: var(--yt-card);
+            padding: 8px;
             border-radius: 8px;
+            margin-bottom: 8px;
             cursor: pointer;
-            transition: background 0.2s;
         }
 
-        .video-card:active, .video-card.active {
-            background: #333;
-            border-left: 4px solid var(--primary-color);
+        .playlist-card.active {
+            border-left: 3px solid var(--yt-red);
+            background: #2a2a2a;
         }
 
-        .video-thumb {
-            width: 110px;
-            aspect-ratio: 16 / 9;
-            border-radius: 6px;
+        .playlist-card img {
+            width: 100px;
+            aspect-ratio: 16/9;
+            border-radius: 4px;
             object-fit: cover;
         }
 
-        .video-info {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .video-info h4 {
+        .playlist-card h4 {
             margin: 0 0 4px 0;
-            font-size: 0.9rem;
-            color: #ffffff;
-            line-height: 1.3;
+            font-size: 0.85rem;
+            color: #fff;
         }
 
-        .video-info p {
+        .playlist-card p {
             margin: 0;
             font-size: 0.75rem;
-            color: var(--hint-color);
+            color: var(--text-sub);
         }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <div class="header-text" id="headerText">
-        <h2>Overlord Bot & Trading Learning Hub</h2>
-        <p>Bot သင်ခန်းစာများ၊ Signal ဖတ်နည်းများနှင့် အခမဲ့ Trading သင်တန်းများ စုစည်းမှု</p>
-    </div>
+    <!-- YouTube Exact Player Container -->
+    <div class="yt-player-wrapper" id="ytPlayerWrapper">
+        <iframe id="ytPlayer" src="https://www.youtube.com/embed/M7lc1UVf-VE?enablejsapi=1&controls=0&rel=0&modestbranding=1&disablekb=1&playsinline=1"></iframe>
 
-    <!-- Video Player Container -->
-    <div class="video-container" id="videoBox">
-        <div class="full-shield-overlay" id="gestureOverlay"></div>
-        <div class="hud-indicator" id="hudIndicator"></div>
+        <!-- YouTube Player Controls Overlay -->
+        <div class="yt-overlay" id="ytOverlay">
+            <div class="yt-top-bar">
+                <div class="yt-video-title" id="videoTitle">Overlord Bot - Trading Course</div>
+            </div>
 
-        <iframe 
-            id="ytPlayer"
-            src="https://www.youtube.com/embed/M7lc1UVf-VE?enablejsapi=1&rel=0&modestbranding=1&hl=my&cc_lang_pref=my&cc_load_policy=1"
-            title="Overlord Player" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-            allowfullscreen>
-        </iframe>
+            <button class="yt-center-btn" id="centerPlayBtn" onclick="togglePlay()">▶</button>
 
-        <!-- In-Player Progress Timeline Overlay -->
-        <div class="progress-overlay-bar">
-            <div class="progress-bar-container">
-                <div class="progress-fill" id="progressFill"></div>
-                <input type="range" class="seek-input" id="seekInput" min="0" max="100" value="0" step="0.1">
+            <!-- Touch Ripple Seeking Display -->
+            <div class="ripple-indicator left" id="rippleLeft">
+                <div>⏪</div>
+                <div>10 Seconds</div>
+            </div>
+            <div class="ripple-indicator right" id="rippleRight">
+                <div>⏩</div>
+                <div>10 Seconds</div>
+            </div>
+
+            <!-- Settings Menu Popup -->
+            <div class="settings-menu" id="settingsMenu">
+                <div class="menu-item" onclick="setSpeed(0.5)"><span>Speed</span> <span>0.5x</span></div>
+                <div class="menu-item" onclick="setSpeed(1)"><span>Speed</span> <span>1.0x (Normal)</span></div>
+                <div class="menu-item" onclick="setSpeed(1.5)"><span>Speed</span> <span>1.5x</span></div>
+                <div class="menu-item" onclick="setSpeed(2)"><span>Speed</span> <span>2.0x</span></div>
+                <hr style="border: 0.5px solid rgba(255,255,255,0.1); width: 100%; margin: 2px 0;">
+                <div class="menu-item" onclick="setQuality('hd1080')"><span>Quality</span> <span>1080p</span></div>
+                <div class="menu-item" onclick="setQuality('hd720')"><span>Quality</span> <span>720p</span></div>
+                <div class="menu-item" onclick="setQuality('medium')"><span>Quality</span> <span>360p</span></div>
+            </div>
+
+            <!-- Bottom YouTube Control Bar -->
+            <div class="yt-bottom-bar">
+                <div class="yt-progress-container">
+                    <div class="yt-progress-bg">
+                        <div class="yt-progress-fill" id="progressFill">
+                            <div class="yt-progress-scrubber"></div>
+                        </div>
+                    </div>
+                    <input type="range" class="yt-range-input" id="progressInput" min="0" max="100" value="0" step="0.1">
+                </div>
+
+                <div class="yt-controls-row">
+                    <div class="yt-left-controls">
+                        <button class="yt-btn" id="playBtn" onclick="togglePlay()">▶</button>
+                        <button class="yt-btn" onclick="nextVideo()">⏭</button>
+                        <div class="volume-group">
+                            <button class="yt-btn" id="muteBtn" onclick="toggleMute()">🔊</button>
+                            <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="100">
+                        </div>
+                        <span class="yt-time" id="timeLabel">00:00 / 00:00</span>
+                    </div>
+
+                    <div class="yt-right-controls">
+                        <button class="yt-btn" onclick="toggleCC()">💬</button>
+                        <button class="yt-btn" onclick="toggleSettings()">⚙️</button>
+                        <button class="yt-btn" onclick="toggleFullscreen()">⛶</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Control Buttons Panel -->
-    <div class="controls-bar" id="controlsBar">
-        <button class="btn-control" onclick="prevVideo()">⏮ ရှေ့တစ်ပုဒ်</button>
-        <button class="btn-control" onclick="togglePlayPause()"><span id="playStateIcon">▶</span> Play/Pause</button>
-        <button class="btn-control" onclick="nextVideo()">နောက်တစ်ပုဒ် ⏭</button>
-
-        <select class="btn-control" id="subtitleSelect" onchange="changeSubtitle(this.value)">
-            <option value="off">💬 CC: ပိတ်မည်</option>
-            <option value="my">💬 မြန်မာစာတန်းထိုး</option>
-            <option value="en">💬 English Subtitle</option>
-        </select>
-
-        <button class="btn-control" id="ttsBtn" onclick="toggleVoiceOver()">🔊 Voice: Off</button>
-
-        <select class="btn-control" id="qualitySelect" onchange="changeQuality(this.value)">
-            <option value="auto">⚙️ Quality: Auto</option>
-            <option value="hd1080">⚙️ 1080p (HD)</option>
-            <option value="hd720">⚙️ 720p (HD)</option>
-            <option value="large">⚙️ 480p</option>
-            <option value="medium">⚙️ 360p</option>
-        </select>
-
-        <button class="btn-control" onclick="toggleManualFullscreen()">
-            <span id="btnIcon">⛶</span> <span id="btnText">မျက်နှာပြင် အပြည့်ကြည့်မည် (Zoom)</span>
-        </button>
-
-        <span class="time-text" id="timeDisplay">00:00 / 00:00</span>
-    </div>
-
-    <!-- Classroom Whiteboard Section -->
-    <div class="whiteboard-card">
-        <div class="board-header">
-            <div class="board-title">📖 သင်ခန်းစာ မှတ်စုအပြည့်အစုံ (Interactive Notebook)</div>
-            <div class="board-actions">
-                <button class="copy-btn" onclick="copyFullNotes()">📋 Copy Notes</button>
-            </div>
+    <!-- Search & Playlist Section -->
+    <div class="content-section">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="YouTube Video Link (သို့) ID ရိုက်ထည့်ပါ..." onkeydown="if(event.key==='Enter') loadCustomVideo()">
+            <button onclick="loadCustomVideo()">ဖွင့်မည်</button>
         </div>
-        <div class="script-document" id="scriptBox"></div>
-    </div>
 
-    <!-- Interactive YouTube Search Bar Section -->
-    <div class="search-box-container">
-        <input type="text" id="searchInput" class="search-input" placeholder="YouTube Link, Video ID (သို့) စာသားရိုက်၍ ရှာပါ..." oninput="liveFilterLocal()" onkeydown="if(event.key==='Enter') performSearch()">
-        <button class="btn-control" onclick="performSearch()">🔍 ရှာမည်</button>
-    </div>
-
-    <!-- Learning Categories & Playlist Hub Section -->
-    <div class="learning-hub-section" id="learningHubContainer"></div>
-
-    <!-- Dynamic Search / RSS Queue Section -->
-    <div class="playlist-section">
-        <div class="playlist-title" id="playlistTitleHeader">📚 RSS / ရှာဖွေတွေ့ရှိချက်များ စာရင်း</div>
-        <div class="video-list" id="videoListContainer"></div>
+        <div id="playlistContainer"></div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
-
-        // YouTube Data API Key (ထည့်သွင်းထားပါက YouTube တွင် စာသားဖြင့် ရှာဖွေနိုင်ပါမည်)
-        const YOUTUBE_API_KEY = "__YOUTUBE_API_KEY__";
-        const PLAYLIST_ID = "PLATyixI4j2D8"; 
-        const CHANNEL_ID = "UCSyM27DAnWU9Yd60eqCPufg"; 
-
-        const videoBox = document.getElementById('videoBox');
-        const ytIframe = document.getElementById('ytPlayer');
-        const gestureOverlay = document.getElementById('gestureOverlay');
-        const hudIndicator = document.getElementById('hudIndicator');
-        const qualitySelect = document.getElementById('qualitySelect');
-        const subtitleSelect = document.getElementById('subtitleSelect');
-        const ttsBtn = document.getElementById('ttsBtn');
-        const btnText = document.getElementById('btnText');
-        const btnIcon = document.getElementById('btnIcon');
-        const playStateIcon = document.getElementById('playStateIcon');
-        const progressFill = document.getElementById('progressFill');
-        const seekInput = document.getElementById('seekInput');
-        const timeDisplay = document.getElementById('timeDisplay');
-        const searchInput = document.getElementById('searchInput');
-
-        // Course Data Structure
-        const courseData = [
-            {
-                category: "🤖 Overlord Bot တရားဝင် သင်ခန်းစာများ (Private Course)",
-                items: [
-                    { type: "video", id: "M7lc1UVf-VE", title: "၁။ Overlord Bot အခြေခံ အသုံးပြုနည်း", tag: "Private Course", badgeClass: "badge-course" },
-                    { type: "video", id: "L_LUpnjgPso", title: "၂။ Signal များဖတ်ပြီး Trade ဝင်နည်း", tag: "Private Course", badgeClass: "badge-course" },
-                    { type: "video", id: "fJ9rUzIMcZQ", title: "၃။ Risk Management နှင့် Stop Loss ပြင်ဆင်နည်း", tag: "Private Course", badgeClass: "badge-course" }
-                ]
-            },
-            {
-                category: "📊 Technical Analysis & Full Courses (External Playlists)",
-                items: [
-                    { type: "playlist", id: "PLrAXtmErZgOdP_8G_RyeyC3I", thumbVideoId: "M7lc1UVf-VE", title: "Technical Analysis အခမဲ့ Full Course (Playlist)", tag: "📺 Full Playlist", badgeClass: "badge-playlist" }
-                ]
-            },
-            {
-                category: "💡 Trading Psychology & Free Basics (Individual Videos)",
-                items: [
-                    { type: "video", id: "M7lc1UVf-VE", title: "Candlestick Pattern အခြေခံ ဖတ်နည်း", tag: "Free YouTube", badgeClass: "badge-free" }
-                ]
-            }
-        ];
-
-        let playlistData = [
-            { id: "M7lc1UVf-VE", title: "၁။ Overlord Bot အခြေခံ အသုံးပြုနည်း", duration: "05:20" },
-            { id: "L_LUpnjgPso", title: "၂။ Signal များဖတ်ပြီး Trade ဝင်နည်း", duration: "08:15" },
-            { id: "fJ9rUzIMcZQ", title: "၃။ Risk Management နှင့် Stop Loss ပြင်ဆင်နည်း", duration: "06:40" }
-        ];
+        tg.ready(); tg.expand();
 
         let player;
-        let isPlayerReady = false;
-        let isVoiceOverEnabled = false;
-        let currentVideoIndex = 0;
-        let isSeeking = false;
+        let isReady = false;
+        let overlayTimeout;
+        let currentIdx = 0;
 
-        const originalLessonData = [
-            { start: 0, duration: 4, text: "မင်္ဂလာပါ၊ ဒီနေ့ သင်ခန်းစာမှာတော့ Overlord Bot နှင့် Trading အခြေခံကို လေ့လာသွားပါမယ်။" },
-            { start: 4, duration: 5, text: "ပထမဆုံးအနေနဲ့ Bot ရဲ့ Signal ဖတ်နည်းနဲ့ Order ဝင်နည်းကို စတင် ရှင်းပြပေးပါမယ်။" },
-            { start: 9, duration: 6, text: "Signal ဆိုတာ Market ရဲ့ Trend နဲ့ Entry Point တွေကို အလိုအလျောက် တွက်ချက်ပေးတာ ဖြစ်ပါတယ်။" },
-            { start: 15, duration: 5, text: "Risk Management အတွက် Stop Loss နဲ့ Take Profit ကို စနစ်တကျ ပြင်ဆင်ထားဖို့ လိုအပ်ပါတယ်။" },
-            { start: 20, duration: 6, text: "ဒီ စာကြောင်းတွေကို စာအုပ်လို ဖတ်နိုင်ပြီး နှိပ်လိုက်ရင် Video ရဲ့ သက်ဆိုင်ရာ အချိန်သို့ တိုက်ရိုက် ခုန်သွားပါမည်။" }
+        const playlist = [
+            { id: "M7lc1UVf-VE", title: "၁။ Overlord Bot အခြေခံ အသုံးပြုနည်း" },
+            { id: "L_LUpnjgPso", title: "၂။ Signal ဖတ်နည်းနှင့် Order ပြင်ဆင်ခြင်း" },
+            { id: "fJ9rUzIMcZQ", title: "၃။ Risk Management & Stop Loss" }
         ];
-
-        let activeLineIndex = -1;
-
-        async function fetchVideosFromRSS() {
-            let rssUrl = "";
-            if (PLAYLIST_ID && PLAYLIST_ID.length > 5) {
-                rssUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${PLAYLIST_ID}`;
-            } else if (CHANNEL_ID) {
-                rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL_ID}`;
-            }
-            if (!rssUrl) return;
-
-            try {
-                const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
-                const response = await fetch(apiUrl);
-                const data = await response.json();
-
-                if (data.items && data.items.length > 0) {
-                    playlistData = data.items.map((item, idx) => {
-                        let videoId = item.link.includes('v=') ? item.link.split('v=')[1].split('&')[0] : item.guid.replace('yt:video:', '');
-                        return {
-                            id: videoId,
-                            title: `${idx + 1}။ ${item.title}`,
-                            duration: item.pubDate ? new Date(item.pubDate).toLocaleDateString() : "Video"
-                        };
-                    }).filter(v => v.id);
-
-                    renderPlaylist();
-                }
-            } catch (err) {
-                console.error("RSS Fetch Error:", err);
-            }
-        }
 
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('ytPlayer', {
                 events: {
-                    'onReady': () => { 
-                        isPlayerReady = true; 
-                        updateQualityMenu();
-                        renderCategorizedHub();
+                    'onReady': () => {
+                        isReady = true;
                         renderPlaylist();
-                        renderScriptDocument(originalLessonData);
-
-                        const savedVideoId = localStorage.getItem('last_yt_id');
-                        const savedTime = localStorage.getItem('last_yt_time');
-                        if (savedVideoId) {
-                            const idx = playlistData.findIndex(v => v.id === savedVideoId);
-                            if (idx !== -1) currentVideoIndex = idx;
-                            player.loadVideoById(savedVideoId, parseFloat(savedTime) || 0);
-                        }
-
-                        fetchVideosFromRSS();
-                        startProgressLoop();
+                        startProgressTracker();
                     },
-                    'onStateChange': (event) => {
-                        if (event.data === YT.PlayerState.PLAYING) {
-                            updateQualityMenu();
-                            playStateIcon.textContent = '⏸';
+                    'onStateChange': (e) => {
+                        if (e.data === YT.PlayerState.PLAYING) {
+                            document.getElementById('playBtn').textContent = '⏸';
+                            document.getElementById('centerPlayBtn').textContent = '⏸';
+                            autoHideOverlay();
                         } else {
-                            playStateIcon.textContent = '▶';
+                            document.getElementById('playBtn').textContent = '▶';
+                            document.getElementById('centerPlayBtn').textContent = '▶';
+                            showOverlay();
                         }
-                        if (event.data === YT.PlayerState.ENDED) nextVideo();
                     }
                 }
             });
         }
 
-        // -------------------------------------------------------------
-        // 🔍 FULL YOUTUBE SEARCH & LIVE FILTER ENGINE
-        // -------------------------------------------------------------
-        function extractVideoId(url) {
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-            const match = url.match(regExp);
-            return (match && match[2].length === 11) ? match[2] : (url.length === 11 ? url : null);
-        }
-
-        // Live Search Filter Across Loaded Courses & Playlists
-        function liveFilterLocal() {
-            const query = searchInput.value.trim().toLowerCase();
-            if (!query) {
-                renderCategorizedHub();
-                renderPlaylist();
-                return;
-            }
-
-            // Filter Playlist Queue
-            const filteredPlaylist = playlistData.filter(item => item.title.toLowerCase().includes(query));
-            renderCustomPlaylist(filteredPlaylist);
-        }
-
-        function renderCustomPlaylist(list) {
-            const container = document.getElementById('videoListContainer');
-            container.innerHTML = '';
-            if (list.length === 0) {
-                container.innerHTML = '<div style="color:#aaa; padding:10px; font-size:0.85rem;">ရှာဖွေမှုနှင့် ကိုက်ညီသော ဗီဒီယို မရှိပါ။</div>';
-                return;
-            }
-
-            list.forEach((vid, index) => {
-                const card = document.createElement('div');
-                card.className = `video-card ${vid.id === (playlistData[currentVideoIndex]?.id) ? 'active' : ''}`;
-                card.onclick = () => {
-                    const originalIdx = playlistData.findIndex(p => p.id === vid.id);
-                    if (originalIdx !== -1) playVideoAtIndex(originalIdx);
-                    else {
-                        player.loadVideoById(vid.id);
-                        showHUD(`▶ ${vid.title}`);
-                    }
-                };
-                card.innerHTML = `
-                    <img class="video-thumb" src="https://img.youtube.com/vi/${vid.id}/mqdefault.jpg">
-                    <div class="video-info">
-                        <h4>${vid.title}</h4>
-                        <p>⏱ ကြာချိန် / Channel - ${vid.duration}</p>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        async function performSearch() {
-            const query = searchInput.value.trim();
-            if (!query) return;
-
-            // 1. Direct YouTube URL or Video ID Match
-            const extractedId = extractVideoId(query);
-            if (extractedId) {
-                const newVid = { id: extractedId, title: "ထည့်သွင်းထားသော ဗီဒီယို (" + extractedId + ")", duration: "Direct Link" };
-                playlistData.unshift(newVid);
-                currentVideoIndex = 0;
-                renderPlaylist();
-                playVideoAtIndex(0);
-                showHUD("▶ YouTube Link ဖြင့် ဖွင့်နေပါသည်");
-                searchInput.value = '';
-                return;
-            }
-
-            // 2. YouTube Data API Search (If Key is Provided)
-            if (YOUTUBE_API_KEY) {
-                try {
-                    showHUD("🔍 YouTube တွင် ရှာဖွေနေပါသည်...");
-                    const response = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${encodeURIComponent(query)}&type=video&key=${YOUTUBE_API_KEY}`);
-                    const data = await response.json();
-
-                    if (data.items && data.items.length > 0) {
-                        playlistData = data.items.map(item => ({
-                            id: item.id.videoId,
-                            title: item.snippet.title,
-                            duration: item.snippet.channelTitle
-                        }));
-                        currentVideoIndex = 0;
-                        document.getElementById('playlistTitleHeader').textContent = `🔍 ရှာဖွေတွေ့ရှိသည့် ဗီဒီယိုများ (${query})`;
-                        renderPlaylist();
-                        playVideoAtIndex(0);
-                        showHUD("✅ ဗီဒီယိုများ တွေ့ရှိပါသည်");
-                        return;
-                    }
-                } catch (err) {
-                    showHUD("❌ API Search Error");
-                }
-            }
-
-            // 3. Fallback: Local Search Result
-            liveFilterLocal();
-            showHUD(`🔍 "${query}" အား ရှာဖွေထားသည်`);
-        }
-
-        function renderCategorizedHub() {
-            const container = document.getElementById('learningHubContainer');
-            container.innerHTML = '';
-            courseData.forEach((section) => {
-                const header = document.createElement('div');
-                header.className = 'category-header';
-                header.textContent = section.category;
-                container.appendChild(header);
-
-                const cardList = document.createElement('div');
-                cardList.className = 'item-card-list';
-
-                section.items.forEach((item) => {
-                    const card = document.createElement('div');
-                    card.className = 'item-card';
-                    card.onclick = () => playItem(item, card);
-
-                    let thumbUrl = item.type === "video" ? `https://img.youtube.com/vi/${item.id}/mqdefault.jpg` : `https://img.youtube.com/vi/${item.thumbVideoId || "M7lc1UVf-VE"}/mqdefault.jpg`;
-
-                    card.innerHTML = `
-                        <div class="item-thumb-wrapper">
-                            <img class="item-thumb" src="${thumbUrl}">
-                            ${item.type === 'playlist' ? '<span class="playlist-badge-icon">☰ PLAYLIST</span>' : ''}
-                        </div>
-                        <div class="item-info">
-                            <h4>${item.title}</h4>
-                            <span class="badge-tag ${item.badgeClass}">${item.tag}</span>
-                        </div>
-                    `;
-                    cardList.appendChild(card);
-                });
-                container.appendChild(cardList);
-            });
-        }
-
-        function playItem(item, cardElement) {
-            if (!isPlayerReady) return;
-            document.querySelectorAll('.item-card').forEach(c => c.classList.remove('active'));
-            if (cardElement) cardElement.classList.add('active');
-
-            if (item.type === "video") {
-                player.loadVideoById(item.id);
-                showHUD(`▶ ${item.title}`);
-                if (isVoiceOverEnabled) speakText(item.title, 'en-US');
-            } else if (item.type === "playlist") {
-                player.loadPlaylist({ listType: 'playlist', list: item.id, index: 0, startSeconds: 0 });
-                showHUD(`📺 Playlist Loaded: ${item.title}`);
-                if (isVoiceOverEnabled) speakText("Playlist loaded", 'en-US');
+        // Play/Pause Control
+        function togglePlay() {
+            if (!isReady) return;
+            if (player.getPlayerState() === YT.PlayerState.PLAYING) {
+                player.pauseVideo();
+            } else {
+                player.playVideo();
             }
         }
 
-        function renderPlaylist() {
-            renderCustomPlaylist(playlistData);
+        // Overlay Auto-Hide Management
+        const wrapper = document.getElementById('ytPlayerWrapper');
+        const overlay = document.getElementById('ytOverlay');
+
+        wrapper.addEventListener('mousemove', showOverlay);
+        wrapper.addEventListener('touchstart', showOverlay, {passive: true});
+
+        function showOverlay() {
+            overlay.classList.remove('hidden');
+            clearTimeout(overlayTimeout);
+            if (isReady && player.getPlayerState() === YT.PlayerState.PLAYING) {
+                overlayTimeout = setTimeout(() => overlay.classList.add('hidden'), 3000);
+            }
         }
 
-        function playVideoAtIndex(index) {
-            if (!isPlayerReady || !playlistData[index]) return;
-            currentVideoIndex = index;
-            const vid = playlistData[index];
-            player.loadVideoById(vid.id);
-            renderPlaylist();
-            showHUD(`▶ ${vid.title}`);
+        function autoHideOverlay() {
+            clearTimeout(overlayTimeout);
+            overlayTimeout = setTimeout(() => overlay.classList.add('hidden'), 2500);
         }
 
-        function nextVideo() {
-            if (!isPlayerReady) return;
-            if (currentVideoIndex < playlistData.length - 1) playVideoAtIndex(currentVideoIndex + 1);
-            else if (player.nextVideo) player.nextVideo();
-            showHUD("⏭ နောက်တစ်ပုဒ်");
-        }
+        // Scrubbing & Time Update
+        const progressInput = document.getElementById('progressInput');
+        const progressFill = document.getElementById('progressFill');
 
-        function prevVideo() {
-            if (!isPlayerReady) return;
-            if (currentVideoIndex > 0) playVideoAtIndex(currentVideoIndex - 1);
-            else if (player.previousVideo) player.previousVideo();
-            showHUD("⏮ ရှေ့တစ်ပုဒ်");
-        }
-
-        // Timeline Scrubber & Notebook Sync
-        seekInput.addEventListener('input', (e) => {
-            isSeeking = true;
+        progressInput.addEventListener('input', (e) => {
             progressFill.style.width = e.target.value + '%';
         });
 
-        seekInput.addEventListener('change', (e) => {
-            if (isPlayerReady) {
+        progressInput.addEventListener('change', (e) => {
+            if (isReady) {
                 const duration = player.getDuration();
                 player.seekTo((e.target.value / 100) * duration, true);
             }
-            isSeeking = false;
         });
 
-        function startProgressLoop() {
+        function startProgressTracker() {
             setInterval(() => {
-                if (isPlayerReady && !isSeeking && player.getPlayerState() === YT.PlayerState.PLAYING) {
+                if (isReady && player.getPlayerState() === YT.PlayerState.PLAYING) {
                     const current = player.getCurrentTime();
                     const duration = player.getDuration();
                     if (duration > 0) {
                         const pct = (current / duration) * 100;
                         progressFill.style.width = pct + '%';
-                        seekInput.value = pct;
-                        timeDisplay.textContent = `${formatTime(current)} / ${formatTime(duration)}`;
-                        if (playlistData[currentVideoIndex]) {
-                            localStorage.setItem('last_yt_id', playlistData[currentVideoIndex].id);
-                            localStorage.setItem('last_yt_time', current);
-                        }
+                        progressInput.value = pct;
+                        document.getElementById('timeLabel').textContent = `${formatTime(current)} / ${formatTime(duration)}`;
                     }
                 }
-                syncScriptWithVideo();
             }, 300);
         }
 
-        function formatTime(sec) {
-            if (isNaN(sec) || sec < 0) return "00:00";
-            const m = Math.floor(sec / 60);
-            const s = Math.floor(sec % 60);
-            return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+        function formatTime(s) {
+            const m = Math.floor(s / 60);
+            const sec = Math.floor(s % 60);
+            return `${m}:${sec < 10 ? '0' : ''}${sec}`;
         }
 
-        function renderScriptDocument(data) {
-            const scriptBox = document.getElementById('scriptBox');
-            if (!scriptBox) return;
-            scriptBox.innerHTML = '';
-            data.forEach((item, index) => {
-                const line = document.createElement('div');
-                line.className = 'script-line';
-                line.id = `line-${index}`;
-                const minutes = Math.floor(item.start / 60);
-                const seconds = Math.floor(item.start % 60).toString().padStart(2, '0');
-                line.innerHTML = `<span class="timestamp-badge">${minutes}:${seconds}</span> <span>${item.text}</span>`;
-                line.onclick = () => {
-                    if (isPlayerReady && player.seekTo) {
-                        player.seekTo(item.start, true);
-                        player.playVideo();
-                        showHUD(`⏱ Jump to ${minutes}:${seconds}`);
-                    }
-                };
-                scriptBox.appendChild(line);
-            });
-        }
-
-        function syncScriptWithVideo() {
-            if (!isPlayerReady || !player || typeof player.getCurrentTime !== 'function') return;
-            const currentTime = player.getCurrentTime();
-            const currentIndex = originalLessonData.findIndex(item => currentTime >= item.start && currentTime < (item.start + (item.duration || 5)));
-            if (currentIndex !== -1 && currentIndex !== activeLineIndex) {
-                if (activeLineIndex !== -1) {
-                    const prevLine = document.getElementById(`line-${activeLineIndex}`);
-                    if (prevLine) prevLine.classList.remove('active');
-                }
-                const currentLine = document.getElementById(`line-${currentIndex}`);
-                if (currentLine) {
-                    currentLine.classList.add('active');
-                    currentLine.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                }
-                activeLineIndex = currentIndex;
+        // Volume Controls
+        const volumeSlider = document.getElementById('volumeSlider');
+        volumeSlider.addEventListener('input', (e) => {
+            if (isReady) {
+                player.setVolume(e.target.value);
+                document.getElementById('muteBtn').textContent = e.target.value == 0 ? '🔇' : '🔊';
             }
-        }
-
-        function copyFullNotes() {
-            const fullText = originalLessonData.map(item => item.text).join('\n');
-            navigator.clipboard.writeText(fullText).then(() => {
-                showHUD("📋 Notes Copied!");
-                alert('✅ မှတ်စု စာသားအကုန်လုံးကို Copy ယူပြီးပါပြီ။');
-            });
-        }
-
-        // Voice TTS & Subtitle Controls
-        function speakText(text, lang = 'en-US') {
-            if (!('speechSynthesis' in window) || !isVoiceOverEnabled) return;
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = lang;
-            window.speechSynthesis.speak(utterance);
-        }
-
-        function toggleVoiceOver() {
-            isVoiceOverEnabled = !isVoiceOverEnabled;
-            if (isVoiceOverEnabled) {
-                ttsBtn.classList.add('active');
-                ttsBtn.textContent = "🔊 Voice: On";
-                showHUD("🔊 Voice Read Aloud: Enabled");
-                speakText("Voice readout enabled", "en-US");
-            } else {
-                ttsBtn.classList.remove('active');
-                ttsBtn.textContent = "🔊 Voice: Off";
-                showHUD("🔇 Voice Read Aloud: Disabled");
-                window.speechSynthesis.cancel();
-            }
-        }
-
-        function changeSubtitle(langCode) {
-            if (!isPlayerReady) return;
-            if (langCode === 'off') {
-                player.unloadModule('captions');
-                player.setOption('captions', 'track', {});
-                showHUD("💬 စာတန်းထိုး: ပိတ်ပါသည်");
-            } else {
-                player.loadModule('captions');
-                player.setOption('captions', 'track', {'languageCode': langCode});
-                showHUD(`💬 Subtitle: ${langCode.toUpperCase()}`);
-            }
-        }
-
-        function updateQualityMenu() {
-            if (!isPlayerReady) return;
-            try {
-                const qualities = player.getAvailableQualityLevels();
-                if (qualities && qualities.length > 0) {
-                    const currentQual = player.getPlaybackQuality();
-                    qualitySelect.innerHTML = '';
-                    qualities.forEach(q => {
-                        const opt = document.createElement('option');
-                        opt.value = q;
-                        opt.textContent = `⚙️ ${q}`;
-                        if (q === currentQual) opt.selected = true;
-                        qualitySelect.appendChild(opt);
-                    });
-                }
-            } catch(e) {}
-        }
-
-        function changeQuality(val) {
-            if (!isPlayerReady) return;
-            player.setPlaybackQuality(val);
-            showHUD(`⚙️ Quality: ${val}`);
-        }
-
-        // Touch Gestures System
-        let touchStartX = 0, touchStartY = 0;
-        let currentBrightness = 1.0, currentVolume = 100, currentZoom = 1.0;
-        let initialPinchDist = 0, lastTapTime = 0, tapTimeout;
-        let isSeekingGesture = false, isVolumeGesture = false, isBrightnessGesture = false;
-        let seekDeltaTime = 0, hudTimeout;
-
-        function showHUD(text) {
-            hudIndicator.textContent = text;
-            hudIndicator.classList.add('show');
-            clearTimeout(hudTimeout);
-            hudTimeout = setTimeout(() => hudIndicator.classList.remove('show'), 1200);
-        }
-
-        function getDistance(t1, t2) {
-            return Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
-        }
-
-        gestureOverlay.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 2) {
-                initialPinchDist = getDistance(e.touches[0], e.touches[1]);
-            } else if (e.touches.length === 1) {
-                touchStartX = e.touches[0].clientX;
-                touchStartY = e.touches[0].clientY;
-                isSeekingGesture = isVolumeGesture = isBrightnessGesture = false;
-
-                const currentTime = new Date().getTime();
-                const tapLength = currentTime - lastTapTime;
-
-                if (tapLength < 300 && tapLength > 0) {
-                    clearTimeout(tapTimeout);
-                    handleDoubleTap(touchStartX);
-                } else {
-                    tapTimeout = setTimeout(() => {
-                        if (!isSeekingGesture && !isVolumeGesture && !isBrightnessGesture) togglePlayPause();
-                    }, 300);
-                }
-                lastTapTime = currentTime;
-            }
-        }, { passive: true });
-
-        gestureOverlay.addEventListener('touchmove', (e) => {
-            if (e.touches.length === 2) {
-                const newDist = getDistance(e.touches[0], e.touches[1]);
-                if (initialPinchDist > 0) {
-                    currentZoom = Math.min(Math.max(1.0, currentZoom * (newDist / initialPinchDist)), 3.0);
-                    ytIframe.style.transform = `scale(${currentZoom})`;
-                    showHUD(`🔍 Zoom: ${currentZoom.toFixed(1)}x`);
-                    initialPinchDist = newDist;
-                }
-            } else if (e.touches.length === 1) {
-                const diffX = e.touches[0].clientX - touchStartX;
-                const diffY = e.touches[0].clientY - touchStartY;
-                const rect = gestureOverlay.getBoundingClientRect();
-
-                if (!isSeekingGesture && !isVolumeGesture && !isBrightnessGesture) {
-                    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 15) {
-                        isSeekingGesture = true;
-                        clearTimeout(tapTimeout);
-                    } else if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 15) {
-                        clearTimeout(tapTimeout);
-                        if (touchStartX < rect.width / 2) isBrightnessGesture = true;
-                        else isVolumeGesture = true;
-                    }
-                }
-
-                if (isBrightnessGesture) {
-                    currentBrightness = Math.min(Math.max(0.2, currentBrightness - diffY * 0.003), 1.5);
-                    ytIframe.style.filter = `brightness(${currentBrightness})`;
-                    showHUD(`☀️ Brightness: ${Math.round((currentBrightness / 1.5) * 100)}%`);
-                    touchStartY = e.touches[0].clientY;
-                }
-
-                if (isVolumeGesture && isPlayerReady) {
-                    currentVolume = Math.min(Math.max(0, currentVolume - diffY * 0.2), 100);
-                    player.setVolume(currentVolume);
-                    showHUD(`🔊 Volume: ${Math.round(currentVolume)}%`);
-                    touchStartY = e.touches[0].clientY;
-                }
-
-                if (isSeekingGesture) {
-                    seekDeltaTime = Math.round(diffX * 0.15);
-                    showHUD(`${seekDeltaTime > 0 ? "⏩ +" : "⏪ "}${seekDeltaTime}s`);
-                }
-            }
-        }, { passive: true });
-
-        gestureOverlay.addEventListener('touchend', () => {
-            if (isSeekingGesture && isPlayerReady && seekDeltaTime !== 0) {
-                player.seekTo(player.getCurrentTime() + seekDeltaTime, true);
-                seekDeltaTime = 0;
-            }
-            isSeekingGesture = isVolumeGesture = isBrightnessGesture = false;
         });
 
-        function handleDoubleTap(xPos) {
-            if (!isPlayerReady) return;
-            const rect = gestureOverlay.getBoundingClientRect();
-            const currentTime = player.getCurrentTime();
-
-            if (xPos < rect.width * 0.4) {
-                player.seekTo(currentTime - 10, true);
-                showHUD("⏪ -10 Seconds");
-            } else if (xPos > rect.width * 0.6) {
-                player.seekTo(currentTime + 10, true);
-                showHUD("⏩ +10 Seconds");
+        function toggleMute() {
+            if (!isReady) return;
+            if (player.isMuted()) {
+                player.unMute();
+                document.getElementById('muteBtn').textContent = '🔊';
             } else {
-                togglePlayPause();
+                player.mute();
+                document.getElementById('muteBtn').textContent = '🔇';
             }
         }
 
-        function togglePlayPause() {
-            if (!isPlayerReady) return;
-            if (player.getPlayerState() === YT.PlayerState.PLAYING) {
-                player.pauseVideo();
-                showHUD("⏸ Paused");
-            } else {
-                player.playVideo();
-                showHUD("▶ Playing");
+        // Double Tap Quick Seek Gesture (+10s / -10s)
+        let lastTap = 0;
+        wrapper.addEventListener('touchend', (e) => {
+            const now = new Date().getTime();
+            const timespan = now - lastTap;
+            if (timespan < 300 && timespan > 0) {
+                const rect = wrapper.getBoundingClientRect();
+                const touchX = e.changedTouches[0].clientX - rect.left;
+                if (touchX < rect.width * 0.4) seekRelative(-10, 'rippleLeft');
+                else if (touchX > rect.width * 0.6) seekRelative(10, 'rippleRight');
+            }
+            lastTap = now;
+        });
+
+        function seekRelative(sec, elementId) {
+            if (!isReady) return;
+            player.seekTo(player.getCurrentTime() + sec, true);
+            const el = document.getElementById(elementId);
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 600);
+        }
+
+        // Settings Popup
+        function toggleSettings() {
+            const menu = document.getElementById('settingsMenu');
+            menu.classList.toggle('show');
+        }
+
+        function setSpeed(spd) {
+            if (isReady) player.setPlaybackRate(spd);
+            toggleSettings();
+        }
+
+        function setQuality(q) {
+            if (isReady) player.setPlaybackQuality(q);
+            toggleSettings();
+        }
+
+        // Fullscreen Toggle
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) wrapper.requestFullscreen().catch(()=>{});
+            else document.exitFullscreen().catch(()=>{});
+        }
+
+        // Custom Link/ID Search
+        function loadCustomVideo() {
+            const input = document.getElementById('searchInput').value.trim();
+            const match = input.match(/(?:youtu\.be\/|watch\?v=)([^#\&\?]+)/);
+            const vidId = match ? match[1] : (input.length === 11 ? input : null);
+
+            if (vidId && isReady) {
+                player.loadVideoById(vidId);
+                document.getElementById('videoTitle').textContent = `Direct Video (${vidId})`;
             }
         }
 
-        function toggleManualFullscreen() {
-            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
-            const isFullscreen = videoBox.classList.contains('custom-fullscreen');
-
-            if (!isFullscreen) {
-                videoBox.classList.add('custom-fullscreen');
-                btnText.textContent = "ပုံမှန်အတိုင်း ပြန်ထားမည်";
-                btnIcon.textContent = "✕";
-                if (videoBox.requestFullscreen) videoBox.requestFullscreen().catch(() => {});
-            } else {
-                videoBox.classList.remove('custom-fullscreen');
-                btnText.textContent = "မျက်နှာပြင် အပြည့်ကြည့်မည် (Zoom)";
-                btnIcon.textContent = "⛶";
-                if (document.exitFullscreen && document.fullscreenElement) document.exitFullscreen().catch(() => {});
-            }
+        function renderPlaylist() {
+            const container = document.getElementById('playlistContainer');
+            container.innerHTML = '';
+            playlist.forEach((item, idx) => {
+                const card = document.createElement('div');
+                card.className = `playlist-card ${idx === currentIdx ? 'active' : ''}`;
+                card.onclick = () => {
+                    currentIdx = idx;
+                    player.loadVideoById(item.id);
+                    document.getElementById('videoTitle').textContent = item.title;
+                    renderPlaylist();
+                };
+                card.innerHTML = `
+                    <img src="https://img.youtube.com/vi/${item.id}/mqdefault.jpg">
+                    <div>
+                        <h4>${item.title}</h4>
+                        <p>Overlord Trading Guide</p>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
         }
     </script>
 </body>
